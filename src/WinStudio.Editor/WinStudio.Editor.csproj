@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\WinStudio.Common\WinStudio.Common.csproj" />
+  </ItemGroup>
+</Project>
+

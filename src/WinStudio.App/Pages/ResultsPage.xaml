@@ -1,0 +1,186 @@
+<Page
+    x:Class="WinStudio.App.Pages.ResultsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Background="#FF0D0D0D">
+            <StackPanel Margin="24,20,24,24" Spacing="16">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="OUTPUT" FontFamily="Segoe UI Variable" FontSize="11" Foreground="#FF555555" CharacterSpacing="80" />
+                    <TextBlock Text="Recording Ready" FontFamily="Segoe UI Variable" FontSize="26" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
+                    <TextBlock
+                        x:Name="SummaryTextBlock"
+                        FontFamily="Segoe UI Variable"
+                        FontSize="13"
+                        Foreground="#FF9A9A9A"
+                        TextWrapping="Wrap" />
+                    <Border
+                        x:Name="ProcessingWarningBorder"
+                        Background="#332C1B00"
+                        BorderBrush="#FF805B00"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        Visibility="Collapsed">
+                        <TextBlock
+                            x:Name="ProcessingWarningTextBlock"
+                            FontFamily="Segoe UI Variable"
+                            FontSize="12"
+                            Foreground="#FFFFD48A"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Column="0"
+                        Background="#FF141414"
+                        BorderBrush="#FF262626"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="12">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ToggleButton
+                                    x:Name="EditedPreviewToggle"
+                                    Grid.Column="0"
+                                    Height="36"
+                                    Checked="EditedPreviewToggle_Checked"
+                                    Background="#FF0078D4"
+                                    Foreground="White"
+                                    BorderBrush="#FF0078D4"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Content="Edited" />
+                                <ToggleButton
+                                    x:Name="RawPreviewToggle"
+                                    Grid.Column="1"
+                                    Height="36"
+                                    Checked="RawPreviewToggle_Checked"
+                                    Background="#FF1F1F1F"
+                                    Foreground="#FF9A9A9A"
+                                    BorderBrush="#FF2A2A2A"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Content="Raw" />
+                            </Grid>
+
+                            <Grid>
+                                <MediaPlayerElement
+                                    x:Name="PreviewPlayerElement"
+                                    AreTransportControlsEnabled="True"
+                                    AutoPlay="False"
+                                    MinHeight="360"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch" />
+
+                                <Border
+                                    x:Name="PreviewUnavailableOverlay"
+                                    Background="#CC0D0D0D"
+                                    CornerRadius="10"
+                                    Visibility="Collapsed">
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Spacing="8">
+                                        <TextBlock
+                                            Text="Preview unavailable"
+                                            FontFamily="Segoe UI Variable"
+                                            FontSize="18"
+                                            FontWeight="SemiBold"
+                                            Foreground="#FFF2F2F2"
+                                            HorizontalAlignment="Center" />
+                                        <TextBlock
+                                            x:Name="PreviewUnavailableTextBlock"
+                                            FontFamily="Segoe UI Variable"
+                                            FontSize="12"
+                                            Foreground="#FF9A9A9A"
+                                            TextAlignment="Center"
+                                            TextWrapping="Wrap"
+                                            MaxWidth="320" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Spacing="12">
+                        <Border Background="#FF141414" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="12" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Actions" FontFamily="Segoe UI Variable" FontSize="16" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
+                                <Button
+                                    x:Name="OpenEditedButton"
+                                    Height="40"
+                                    Click="OpenEditedButton_Click"
+                                    CornerRadius="8"
+                                    Background="#FF0078D4"
+                                    Foreground="White"
+                                    BorderBrush="#FF0078D4"
+                                    BorderThickness="1"
+                                    Content="Open Edited Video" />
+                                <Button
+                                    x:Name="OpenRawButton"
+                                    Height="40"
+                                    Click="OpenRawButton_Click"
+                                    CornerRadius="8"
+                                    Background="#FF1F1F1F"
+                                    Foreground="#FFF2F2F2"
+                                    BorderBrush="#FF2A2A2A"
+                                    BorderThickness="1"
+                                    Content="Open Raw Video" />
+                                <Button
+                                    Height="40"
+                                    Click="OpenFolderButton_Click"
+                                    CornerRadius="8"
+                                    Background="#FF1F1F1F"
+                                    Foreground="#FFF2F2F2"
+                                    BorderBrush="#FF2A2A2A"
+                                    BorderThickness="1"
+                                    Content="Open Output Folder" />
+                                <Button
+                                    Height="40"
+                                    Click="NewRecordingButton_Click"
+                                    CornerRadius="8"
+                                    Background="#FF1F1F1F"
+                                    Foreground="#FFF2F2F2"
+                                    BorderBrush="#FF2A2A2A"
+                                    BorderThickness="1"
+                                    Content="New Recording" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#FF141414" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="12" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Files" FontFamily="Segoe UI Variable" FontSize="16" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Edited" FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF7EC8FF" />
+                                    <TextBlock x:Name="EditedPathTextBlock" FontFamily="Cascadia Mono" FontSize="11" Foreground="#FFB8B8B8" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Raw" FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF7EC8FF" />
+                                    <TextBlock x:Name="RawPathTextBlock" FontFamily="Cascadia Mono" FontSize="11" Foreground="#FFB8B8B8" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Cursor / Zoom Data" FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF7EC8FF" />
+                                    <TextBlock x:Name="DataPathTextBlock" FontFamily="Cascadia Mono" FontSize="11" Foreground="#FFB8B8B8" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

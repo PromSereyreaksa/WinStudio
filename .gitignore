@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+artifacts/
+output/
+recordings/
+.codex/
+.dotnet_home/
+AGENTS.md
+UI-Specification.md
+ref/

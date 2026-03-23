@@ -1,0 +1,2618 @@
+[
+  {
+    "TimestampTicks": 639098438703633201,
+    "X": 546,
+    "Y": 201,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438703652653,
+    "X": 546,
+    "Y": 199,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438703891578,
+    "X": 546,
+    "Y": 198,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438704372648,
+    "X": 546,
+    "Y": 197,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438713676613,
+    "X": 546,
+    "Y": 196,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438714973295,
+    "X": 546,
+    "Y": 196,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438716253380,
+    "X": 546,
+    "Y": 196,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716332288,
+    "X": 547,
+    "Y": 196,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716432079,
+    "X": 549,
+    "Y": 198,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716491071,
+    "X": 551,
+    "Y": 199,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716572155,
+    "X": 554,
+    "Y": 201,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716652302,
+    "X": 559,
+    "Y": 205,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716732016,
+    "X": 566,
+    "Y": 209,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716832919,
+    "X": 574,
+    "Y": 215,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716891286,
+    "X": 582,
+    "Y": 221,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438716972696,
+    "X": 591,
+    "Y": 227,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717052428,
+    "X": 598,
+    "Y": 233,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717132629,
+    "X": 607,
+    "Y": 241,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717231668,
+    "X": 614,
+    "Y": 247,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717291480,
+    "X": 622,
+    "Y": 253,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717371711,
+    "X": 628,
+    "Y": 258,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717457835,
+    "X": 632,
+    "Y": 263,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717531919,
+    "X": 635,
+    "Y": 268,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717632751,
+    "X": 638,
+    "Y": 274,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717691835,
+    "X": 638,
+    "Y": 275,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717777055,
+    "X": 638,
+    "Y": 276,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717852588,
+    "X": 640,
+    "Y": 279,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438717931699,
+    "X": 640,
+    "Y": 280,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718032977,
+    "X": 640,
+    "Y": 282,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718092165,
+    "X": 640,
+    "Y": 283,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718172011,
+    "X": 640,
+    "Y": 286,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718252622,
+    "X": 640,
+    "Y": 287,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718412385,
+    "X": 639,
+    "Y": 288,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718572312,
+    "X": 638,
+    "Y": 289,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718652213,
+    "X": 637,
+    "Y": 290,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718732664,
+    "X": 635,
+    "Y": 290,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718832712,
+    "X": 634,
+    "Y": 292,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718891472,
+    "X": 633,
+    "Y": 292,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438718973169,
+    "X": 631,
+    "Y": 293,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719052769,
+    "X": 630,
+    "Y": 293,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719132017,
+    "X": 628,
+    "Y": 294,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719231373,
+    "X": 626,
+    "Y": 294,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719292310,
+    "X": 625,
+    "Y": 295,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719372847,
+    "X": 624,
+    "Y": 295,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719452763,
+    "X": 622,
+    "Y": 295,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719532329,
+    "X": 620,
+    "Y": 296,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719692307,
+    "X": 618,
+    "Y": 296,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438719933722,
+    "X": 617,
+    "Y": 296,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438721433805,
+    "X": 616,
+    "Y": 296,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438722234036,
+    "X": 616,
+    "Y": 296,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438722871623,
+    "X": 616,
+    "Y": 296,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438722973298,
+    "X": 616,
+    "Y": 297,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723031580,
+    "X": 616,
+    "Y": 299,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723113928,
+    "X": 618,
+    "Y": 299,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723273392,
+    "X": 619,
+    "Y": 300,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723512815,
+    "X": 619,
+    "Y": 301,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723532326,
+    "X": 619,
+    "Y": 303,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723671286,
+    "X": 619,
+    "Y": 304,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438723991584,
+    "X": 619,
+    "Y": 305,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438724011873,
+    "X": 619,
+    "Y": 307,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438724411959,
+    "X": 619,
+    "Y": 308,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438724572130,
+    "X": 619,
+    "Y": 309,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438724812387,
+    "X": 619,
+    "Y": 310,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438724891373,
+    "X": 619,
+    "Y": 312,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438726273721,
+    "X": 619,
+    "Y": 313,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438726674747,
+    "X": 619,
+    "Y": 313,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438727131577,
+    "X": 619,
+    "Y": 313,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727291505,
+    "X": 619,
+    "Y": 310,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727372204,
+    "X": 619,
+    "Y": 308,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727471698,
+    "X": 619,
+    "Y": 306,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727541282,
+    "X": 619,
+    "Y": 302,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727613772,
+    "X": 615,
+    "Y": 295,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727691279,
+    "X": 609,
+    "Y": 286,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727772224,
+    "X": 605,
+    "Y": 278,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727872340,
+    "X": 599,
+    "Y": 270,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438727936504,
+    "X": 593,
+    "Y": 264,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728012341,
+    "X": 588,
+    "Y": 259,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728091425,
+    "X": 582,
+    "Y": 255,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728171323,
+    "X": 577,
+    "Y": 250,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728271663,
+    "X": 576,
+    "Y": 248,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728332069,
+    "X": 575,
+    "Y": 248,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728412467,
+    "X": 573,
+    "Y": 247,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728493820,
+    "X": 573,
+    "Y": 245,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438728812563,
+    "X": 573,
+    "Y": 244,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438729073256,
+    "X": 573,
+    "Y": 243,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438729292162,
+    "X": 573,
+    "Y": 242,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438729692609,
+    "X": 573,
+    "Y": 240,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438729932566,
+    "X": 573,
+    "Y": 239,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438730012443,
+    "X": 573,
+    "Y": 238,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438730093381,
+    "X": 573,
+    "Y": 236,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438730273053,
+    "X": 573,
+    "Y": 235,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438730332241,
+    "X": 573,
+    "Y": 234,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438730573056,
+    "X": 573,
+    "Y": 233,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438731778791,
+    "X": 573,
+    "Y": 231,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438731953998,
+    "X": 573,
+    "Y": 231,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736513020,
+    "X": 575,
+    "Y": 232,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736592073,
+    "X": 576,
+    "Y": 234,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736691766,
+    "X": 577,
+    "Y": 236,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736752232,
+    "X": 579,
+    "Y": 239,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736831639,
+    "X": 581,
+    "Y": 244,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736912909,
+    "X": 583,
+    "Y": 249,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438736995414,
+    "X": 586,
+    "Y": 254,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737091491,
+    "X": 590,
+    "Y": 259,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737152852,
+    "X": 594,
+    "Y": 265,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737231651,
+    "X": 597,
+    "Y": 270,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737314707,
+    "X": 600,
+    "Y": 275,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737393302,
+    "X": 603,
+    "Y": 279,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737491574,
+    "X": 604,
+    "Y": 285,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737552876,
+    "X": 607,
+    "Y": 290,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737632068,
+    "X": 610,
+    "Y": 293,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737713439,
+    "X": 612,
+    "Y": 297,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737795414,
+    "X": 614,
+    "Y": 300,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737892506,
+    "X": 616,
+    "Y": 303,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438737951961,
+    "X": 619,
+    "Y": 308,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738042981,
+    "X": 619,
+    "Y": 309,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738114152,
+    "X": 620,
+    "Y": 311,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738191588,
+    "X": 621,
+    "Y": 312,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738353364,
+    "X": 622,
+    "Y": 313,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738433195,
+    "X": 624,
+    "Y": 315,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738512246,
+    "X": 624,
+    "Y": 316,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738752211,
+    "X": 625,
+    "Y": 317,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438738992748,
+    "X": 627,
+    "Y": 319,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438741394589,
+    "X": 628,
+    "Y": 320,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438742031378,
+    "X": 628,
+    "Y": 320,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742072774,
+    "X": 628,
+    "Y": 322,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742112898,
+    "X": 628,
+    "Y": 323,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742191979,
+    "X": 627,
+    "Y": 324,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742292799,
+    "X": 626,
+    "Y": 325,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742352285,
+    "X": 625,
+    "Y": 325,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742431849,
+    "X": 623,
+    "Y": 328,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742512098,
+    "X": 620,
+    "Y": 332,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742593264,
+    "X": 616,
+    "Y": 336,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742692300,
+    "X": 610,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742752221,
+    "X": 606,
+    "Y": 342,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742831463,
+    "X": 601,
+    "Y": 344,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742913949,
+    "X": 599,
+    "Y": 346,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438742992059,
+    "X": 598,
+    "Y": 347,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438743632685,
+    "X": 597,
+    "Y": 347,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438743653079,
+    "X": 596,
+    "Y": 347,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438743811913,
+    "X": 594,
+    "Y": 347,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438743974352,
+    "X": 593,
+    "Y": 346,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744052600,
+    "X": 592,
+    "Y": 344,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744131771,
+    "X": 590,
+    "Y": 344,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744212467,
+    "X": 589,
+    "Y": 344,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744312343,
+    "X": 588,
+    "Y": 343,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744372349,
+    "X": 586,
+    "Y": 342,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744614659,
+    "X": 586,
+    "Y": 341,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744853613,
+    "X": 585,
+    "Y": 341,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744891621,
+    "X": 585,
+    "Y": 340,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438744932924,
+    "X": 584,
+    "Y": 340,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438745013504,
+    "X": 582,
+    "Y": 340,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438745253614,
+    "X": 581,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438745272883,
+    "X": 580,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438745512324,
+    "X": 578,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438746073328,
+    "X": 577,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438746713325,
+    "X": 576,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438747114194,
+    "X": 575,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438747191397,
+    "X": 573,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438747195920,
+    "X": 572,
+    "Y": 339,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438751192193,
+    "X": 572,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751271931,
+    "X": 573,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751352814,
+    "X": 578,
+    "Y": 339,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751433046,
+    "X": 587,
+    "Y": 341,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751531972,
+    "X": 599,
+    "Y": 344,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751591170,
+    "X": 620,
+    "Y": 349,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751671810,
+    "X": 650,
+    "Y": 356,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751751902,
+    "X": 679,
+    "Y": 362,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751832237,
+    "X": 714,
+    "Y": 371,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751931294,
+    "X": 757,
+    "Y": 380,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438751991293,
+    "X": 805,
+    "Y": 390,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752071211,
+    "X": 845,
+    "Y": 401,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752151649,
+    "X": 882,
+    "Y": 406,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752232975,
+    "X": 921,
+    "Y": 411,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752331929,
+    "X": 958,
+    "Y": 415,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752393174,
+    "X": 993,
+    "Y": 417,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752473839,
+    "X": 1029,
+    "Y": 417,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752553117,
+    "X": 1056,
+    "Y": 418,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752631779,
+    "X": 1084,
+    "Y": 420,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752731111,
+    "X": 1109,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752792050,
+    "X": 1126,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752873384,
+    "X": 1139,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438752954619,
+    "X": 1150,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753031776,
+    "X": 1158,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753131433,
+    "X": 1165,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753191145,
+    "X": 1169,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753273521,
+    "X": 1172,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753352217,
+    "X": 1175,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753432271,
+    "X": 1177,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753531806,
+    "X": 1178,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753591672,
+    "X": 1179,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753672374,
+    "X": 1181,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753752562,
+    "X": 1182,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753833081,
+    "X": 1183,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753933116,
+    "X": 1185,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438753991662,
+    "X": 1187,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438754073481,
+    "X": 1189,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438754151928,
+    "X": 1191,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438754232063,
+    "X": 1193,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438754331445,
+    "X": 1195,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438754392231,
+    "X": 1196,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438754473402,
+    "X": 1198,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438756552135,
+    "X": 1199,
+    "Y": 421,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438756731886,
+    "X": 1199,
+    "Y": 420,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438756872485,
+    "X": 1199,
+    "Y": 418,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438757031365,
+    "X": 1198,
+    "Y": 417,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438757191402,
+    "X": 1198,
+    "Y": 415,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438757432116,
+    "X": 1196,
+    "Y": 415,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438757591537,
+    "X": 1196,
+    "Y": 414,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438757753141,
+    "X": 1195,
+    "Y": 414,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438757755933,
+    "X": 1195,
+    "Y": 414,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438757911919,
+    "X": 1194,
+    "Y": 413,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438758072559,
+    "X": 1193,
+    "Y": 413,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438758212714,
+    "X": 1191,
+    "Y": 412,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438758313034,
+    "X": 1190,
+    "Y": 412,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438758472244,
+    "X": 1189,
+    "Y": 410,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438758553465,
+    "X": 1189,
+    "Y": 409,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438758874255,
+    "X": 1187,
+    "Y": 409,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438759191463,
+    "X": 1187,
+    "Y": 408,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438759515327,
+    "X": 1186,
+    "Y": 406,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438760214943,
+    "X": 1186,
+    "Y": 406,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438760791815,
+    "X": 1186,
+    "Y": 406,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438760831734,
+    "X": 1184,
+    "Y": 407,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438760871977,
+    "X": 1183,
+    "Y": 408,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438760953611,
+    "X": 1183,
+    "Y": 409,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761031710,
+    "X": 1182,
+    "Y": 411,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761131939,
+    "X": 1182,
+    "Y": 414,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761192387,
+    "X": 1178,
+    "Y": 418,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761272845,
+    "X": 1175,
+    "Y": 424,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761353436,
+    "X": 1170,
+    "Y": 430,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761433871,
+    "X": 1166,
+    "Y": 436,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761531500,
+    "X": 1161,
+    "Y": 441,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761591670,
+    "X": 1155,
+    "Y": 447,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761673989,
+    "X": 1149,
+    "Y": 452,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761755010,
+    "X": 1144,
+    "Y": 455,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761831307,
+    "X": 1138,
+    "Y": 458,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761931588,
+    "X": 1133,
+    "Y": 461,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438761991800,
+    "X": 1130,
+    "Y": 464,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438762875281,
+    "X": 1128,
+    "Y": 464,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438763832850,
+    "X": 1128,
+    "Y": 464,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438764812259,
+    "X": 1128,
+    "Y": 464,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438764891931,
+    "X": 1127,
+    "Y": 466,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765052263,
+    "X": 1126,
+    "Y": 467,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765152238,
+    "X": 1126,
+    "Y": 469,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765212454,
+    "X": 1126,
+    "Y": 470,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765291133,
+    "X": 1126,
+    "Y": 472,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765371960,
+    "X": 1125,
+    "Y": 474,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765453642,
+    "X": 1125,
+    "Y": 475,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765552673,
+    "X": 1125,
+    "Y": 476,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765614943,
+    "X": 1125,
+    "Y": 477,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765691326,
+    "X": 1125,
+    "Y": 479,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765773005,
+    "X": 1124,
+    "Y": 481,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765852293,
+    "X": 1124,
+    "Y": 483,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438765953277,
+    "X": 1124,
+    "Y": 484,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766014136,
+    "X": 1124,
+    "Y": 486,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766094161,
+    "X": 1124,
+    "Y": 487,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766172994,
+    "X": 1124,
+    "Y": 488,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766251849,
+    "X": 1124,
+    "Y": 489,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766491661,
+    "X": 1124,
+    "Y": 491,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766753001,
+    "X": 1124,
+    "Y": 492,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438766834068,
+    "X": 1124,
+    "Y": 493,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438767793409,
+    "X": 1124,
+    "Y": 493,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438768031648,
+    "X": 1124,
+    "Y": 493,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768112866,
+    "X": 1124,
+    "Y": 495,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768195096,
+    "X": 1124,
+    "Y": 497,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768273375,
+    "X": 1124,
+    "Y": 500,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768372176,
+    "X": 1124,
+    "Y": 505,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768435076,
+    "X": 1124,
+    "Y": 509,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768512545,
+    "X": 1124,
+    "Y": 514,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768591332,
+    "X": 1124,
+    "Y": 520,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768673394,
+    "X": 1124,
+    "Y": 525,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768772996,
+    "X": 1121,
+    "Y": 532,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768831500,
+    "X": 1119,
+    "Y": 538,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768912637,
+    "X": 1118,
+    "Y": 544,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438768991150,
+    "X": 1117,
+    "Y": 548,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769072161,
+    "X": 1116,
+    "Y": 550,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769173718,
+    "X": 1115,
+    "Y": 552,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769231821,
+    "X": 1113,
+    "Y": 555,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769312607,
+    "X": 1112,
+    "Y": 557,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769393008,
+    "X": 1111,
+    "Y": 559,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769472940,
+    "X": 1110,
+    "Y": 561,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769572863,
+    "X": 1110,
+    "Y": 564,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769632187,
+    "X": 1109,
+    "Y": 566,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769712218,
+    "X": 1108,
+    "Y": 568,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769793030,
+    "X": 1107,
+    "Y": 570,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438769872835,
+    "X": 1107,
+    "Y": 572,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438770174085,
+    "X": 1107,
+    "Y": 574,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438770438333,
+    "X": 1107,
+    "Y": 575,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438771173171,
+    "X": 1107,
+    "Y": 575,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438771552645,
+    "X": 1107,
+    "Y": 575,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438771712415,
+    "X": 1107,
+    "Y": 576,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438771791395,
+    "X": 1107,
+    "Y": 577,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438771872643,
+    "X": 1107,
+    "Y": 579,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438771972287,
+    "X": 1107,
+    "Y": 581,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772031440,
+    "X": 1106,
+    "Y": 582,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772114025,
+    "X": 1105,
+    "Y": 584,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772192439,
+    "X": 1105,
+    "Y": 586,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772274260,
+    "X": 1104,
+    "Y": 587,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772371685,
+    "X": 1102,
+    "Y": 590,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772434017,
+    "X": 1099,
+    "Y": 595,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772512295,
+    "X": 1096,
+    "Y": 601,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772591695,
+    "X": 1094,
+    "Y": 606,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772673349,
+    "X": 1091,
+    "Y": 611,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772773813,
+    "X": 1089,
+    "Y": 613,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772832262,
+    "X": 1088,
+    "Y": 614,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772913708,
+    "X": 1088,
+    "Y": 616,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438772991512,
+    "X": 1087,
+    "Y": 616,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438774034861,
+    "X": 1087,
+    "Y": 617,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438774435959,
+    "X": 1087,
+    "Y": 617,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438775172555,
+    "X": 1087,
+    "Y": 617,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775231535,
+    "X": 1087,
+    "Y": 618,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775312088,
+    "X": 1087,
+    "Y": 619,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775391494,
+    "X": 1087,
+    "Y": 621,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775472307,
+    "X": 1087,
+    "Y": 623,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775573122,
+    "X": 1087,
+    "Y": 625,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775631724,
+    "X": 1087,
+    "Y": 626,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775713291,
+    "X": 1087,
+    "Y": 628,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775791807,
+    "X": 1087,
+    "Y": 630,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775871993,
+    "X": 1087,
+    "Y": 632,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438775972956,
+    "X": 1087,
+    "Y": 634,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438776031151,
+    "X": 1087,
+    "Y": 635,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438776114099,
+    "X": 1087,
+    "Y": 636,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438776191943,
+    "X": 1087,
+    "Y": 638,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438776272207,
+    "X": 1087,
+    "Y": 639,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438776591330,
+    "X": 1087,
+    "Y": 640,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438777013759,
+    "X": 1088,
+    "Y": 640,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438777175068,
+    "X": 1088,
+    "Y": 642,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438777873084,
+    "X": 1088,
+    "Y": 642,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778053543,
+    "X": 1090,
+    "Y": 642,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778131738,
+    "X": 1091,
+    "Y": 642,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778211650,
+    "X": 1091,
+    "Y": 640,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778273284,
+    "X": 1091,
+    "Y": 635,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778374377,
+    "X": 1091,
+    "Y": 628,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778455360,
+    "X": 1091,
+    "Y": 619,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778531658,
+    "X": 1091,
+    "Y": 604,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778612423,
+    "X": 1091,
+    "Y": 588,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778672317,
+    "X": 1091,
+    "Y": 573,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778772617,
+    "X": 1091,
+    "Y": 557,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778852885,
+    "X": 1088,
+    "Y": 536,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438778931753,
+    "X": 1085,
+    "Y": 516,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779013541,
+    "X": 1082,
+    "Y": 493,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779071320,
+    "X": 1079,
+    "Y": 475,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779171760,
+    "X": 1075,
+    "Y": 454,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779252423,
+    "X": 1071,
+    "Y": 432,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779331595,
+    "X": 1067,
+    "Y": 414,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779416115,
+    "X": 1065,
+    "Y": 399,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779472708,
+    "X": 1062,
+    "Y": 383,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779575593,
+    "X": 1060,
+    "Y": 371,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779652067,
+    "X": 1058,
+    "Y": 359,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779736015,
+    "X": 1054,
+    "Y": 344,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779812694,
+    "X": 1049,
+    "Y": 322,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779874783,
+    "X": 1045,
+    "Y": 310,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438779972285,
+    "X": 1043,
+    "Y": 301,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438780051935,
+    "X": 1042,
+    "Y": 295,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438780134093,
+    "X": 1041,
+    "Y": 291,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438780212731,
+    "X": 1041,
+    "Y": 288,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438780275097,
+    "X": 1040,
+    "Y": 286,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438780452018,
+    "X": 1040,
+    "Y": 285,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438781174230,
+    "X": 1038,
+    "Y": 283,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438781872629,
+    "X": 1038,
+    "Y": 283,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438782053242,
+    "X": 1038,
+    "Y": 284,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438782533547,
+    "X": 1037,
+    "Y": 285,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438782614404,
+    "X": 1037,
+    "Y": 285,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783197596,
+    "X": 1036,
+    "Y": 286,
+    "EventType": 2
+  },
+  {
+    "TimestampTicks": 639098438783335584,
+    "X": 1036,
+    "Y": 286,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783412980,
+    "X": 1034,
+    "Y": 286,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783492644,
+    "X": 1031,
+    "Y": 286,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783593033,
+    "X": 1021,
+    "Y": 283,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783653228,
+    "X": 1004,
+    "Y": 278,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783732151,
+    "X": 981,
+    "Y": 269,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783813766,
+    "X": 958,
+    "Y": 258,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783891690,
+    "X": 937,
+    "Y": 246,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438783992553,
+    "X": 917,
+    "Y": 232,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784052178,
+    "X": 902,
+    "Y": 219,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784132688,
+    "X": 893,
+    "Y": 207,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784213553,
+    "X": 885,
+    "Y": 198,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784291196,
+    "X": 882,
+    "Y": 190,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784391932,
+    "X": 880,
+    "Y": 181,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784455552,
+    "X": 879,
+    "Y": 174,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784533793,
+    "X": 879,
+    "Y": 169,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784612902,
+    "X": 879,
+    "Y": 164,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784691753,
+    "X": 879,
+    "Y": 160,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784791471,
+    "X": 879,
+    "Y": 155,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784853081,
+    "X": 879,
+    "Y": 150,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438784932251,
+    "X": 879,
+    "Y": 146,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785011533,
+    "X": 879,
+    "Y": 143,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785091594,
+    "X": 880,
+    "Y": 140,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785202044,
+    "X": 880,
+    "Y": 138,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785252091,
+    "X": 881,
+    "Y": 135,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785332451,
+    "X": 883,
+    "Y": 133,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785411540,
+    "X": 884,
+    "Y": 130,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785491676,
+    "X": 887,
+    "Y": 128,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785591285,
+    "X": 890,
+    "Y": 126,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785651951,
+    "X": 894,
+    "Y": 124,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785731492,
+    "X": 899,
+    "Y": 122,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785812464,
+    "X": 904,
+    "Y": 119,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785892069,
+    "X": 908,
+    "Y": 117,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438785992499,
+    "X": 913,
+    "Y": 115,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786052988,
+    "X": 916,
+    "Y": 113,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786131155,
+    "X": 919,
+    "Y": 112,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786212089,
+    "X": 922,
+    "Y": 111,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786291515,
+    "X": 923,
+    "Y": 109,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786391831,
+    "X": 925,
+    "Y": 107,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786454127,
+    "X": 927,
+    "Y": 106,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786532414,
+    "X": 928,
+    "Y": 103,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786613512,
+    "X": 930,
+    "Y": 101,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786691564,
+    "X": 930,
+    "Y": 99,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786792166,
+    "X": 931,
+    "Y": 97,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786852166,
+    "X": 933,
+    "Y": 95,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438786931974,
+    "X": 934,
+    "Y": 93,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438787012934,
+    "X": 936,
+    "Y": 92,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438787091191,
+    "X": 936,
+    "Y": 91,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438787191950,
+    "X": 937,
+    "Y": 91,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438787252684,
+    "X": 937,
+    "Y": 90,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438787411466,
+    "X": 938,
+    "Y": 88,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438787653912,
+    "X": 940,
+    "Y": 87,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788052964,
+    "X": 940,
+    "Y": 86,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788131258,
+    "X": 940,
+    "Y": 84,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788212580,
+    "X": 941,
+    "Y": 84,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788391915,
+    "X": 941,
+    "Y": 83,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788452771,
+    "X": 941,
+    "Y": 82,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788531380,
+    "X": 941,
+    "Y": 81,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788612433,
+    "X": 941,
+    "Y": 80,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788691156,
+    "X": 941,
+    "Y": 79,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788792744,
+    "X": 941,
+    "Y": 78,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788853102,
+    "X": 941,
+    "Y": 75,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438788931263,
+    "X": 940,
+    "Y": 74,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789013041,
+    "X": 939,
+    "Y": 73,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789091655,
+    "X": 939,
+    "Y": 72,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789191886,
+    "X": 938,
+    "Y": 71,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789252816,
+    "X": 938,
+    "Y": 70,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789412937,
+    "X": 937,
+    "Y": 69,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789572780,
+    "X": 937,
+    "Y": 68,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789732524,
+    "X": 937,
+    "Y": 67,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438789891721,
+    "X": 937,
+    "Y": 66,
+    "EventType": 0
+  },
+  {
+    "TimestampTicks": 639098438790454759,
+    "X": 937,
+    "Y": 65,
+    "EventType": 1
+  },
+  {
+    "TimestampTicks": 639098438791494326,
+    "X": 937,
+    "Y": 65,
+    "EventType": 2
+  }
+]

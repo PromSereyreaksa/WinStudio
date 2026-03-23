@@ -1,0 +1,21 @@
+<UserControl
+    x:Class="WinStudio.App.Controls.HotkeyBadge"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock
+            Text="{x:Bind Label, Mode=OneWay}"
+            FontFamily="Segoe UI Variable"
+            FontSize="12"
+            Foreground="#FF888888"
+            VerticalAlignment="Center" />
+        <StackPanel
+            x:Name="KeysPanel"
+            Orientation="Horizontal"
+            Spacing="4"
+            VerticalAlignment="Center" />
+    </StackPanel>
+</UserControl>
