@@ -138,6 +138,153 @@
                         <TextBlock
                             x:Name="CaptureSummaryTextBlock"
                             Style="{StaticResource CaptionLabelTextStyle}" />
+
+                        <Border
+                            x:Name="RecordingPreviewCard"
+                            Style="{StaticResource InsetSurfaceStyle}">
+                            <StackPanel Spacing="10">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Text="Recording preview"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AppTextBrush}" />
+
+                                    <TextBlock
+                                        x:Name="PreviewModeTextBlock"
+                                        Grid.Column="1"
+                                        Style="{StaticResource CaptionLabelTextStyle}" />
+                                </Grid>
+
+                                <Border
+                                    Height="196"
+                                    CornerRadius="12"
+                                    BorderThickness="1"
+                                    BorderBrush="{ThemeResource AppStrokeBrush}">
+                                    <Grid>
+                                        <Border
+                                            x:Name="PreviewBackdropBorder"
+                                            Background="{ThemeResource AppSurfaceRaisedBrush}" />
+
+                                        <Image
+                                            x:Name="PreviewBackdropImage"
+                                            Stretch="UniformToFill"
+                                            Visibility="Collapsed" />
+
+                                        <Border
+                                            x:Name="PreviewWindowFrame"
+                                            Width="264"
+                                            Height="150"
+                                            CornerRadius="12"
+                                            Background="{ThemeResource AppSurfaceBrush}"
+                                            BorderThickness="1"
+                                            BorderBrush="{ThemeResource AppStrokeBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                            <Grid>
+                                                <Border
+                                                    Height="28"
+                                                    Background="{ThemeResource AppOverlayBrush}"
+                                                    VerticalAlignment="Top"
+                                                    CornerRadius="12,12,0,0">
+                                                    <Grid Padding="12,0" ColumnSpacing="10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <StackPanel
+                                                            Orientation="Horizontal"
+                                                            Spacing="5"
+                                                            VerticalAlignment="Center">
+                                                            <Ellipse Width="7" Height="7" Fill="#FFFB7185" />
+                                                            <Ellipse Width="7" Height="7" Fill="#FFFBBF24" />
+                                                            <Ellipse Width="7" Height="7" Fill="#FF34D399" />
+                                                        </StackPanel>
+
+                                                        <TextBlock
+                                                            x:Name="PreviewWindowTitleTextBlock"
+                                                            Grid.Column="1"
+                                                            Style="{StaticResource CaptionLabelTextStyle}"
+                                                            VerticalAlignment="Center"
+                                                            TextTrimming="CharacterEllipsis" />
+                                                    </Grid>
+                                                </Border>
+
+                                                <StackPanel Margin="16,48,16,16" Spacing="8">
+                                                    <Border
+                                                        Height="12"
+                                                        Width="148"
+                                                        CornerRadius="6"
+                                                        Background="{ThemeResource AppSurfaceRaisedBrush}" />
+                                                    <Border
+                                                        Height="10"
+                                                        Width="208"
+                                                        CornerRadius="5"
+                                                        Background="{ThemeResource AppSurfaceRaisedBrush}" />
+                                                    <Border
+                                                        Height="10"
+                                                        Width="176"
+                                                        CornerRadius="5"
+                                                        Background="{ThemeResource AppSurfaceRaisedBrush}" />
+                                                    <Grid Margin="0,10,0,0" ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Border
+                                                            Width="72"
+                                                            Height="22"
+                                                            CornerRadius="11"
+                                                            Background="{ThemeResource AppAccentBrush}" />
+                                                        <Border
+                                                            Grid.Column="1"
+                                                            Width="72"
+                                                            Height="22"
+                                                            CornerRadius="11"
+                                                            Background="{ThemeResource AppSurfaceRaisedBrush}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <Canvas IsHitTestVisible="False">
+                                            <Grid
+                                                x:Name="PreviewCursorBadge"
+                                                Width="34"
+                                                Height="34">
+                                                <Grid.RenderTransform>
+                                                    <CompositeTransform x:Name="PreviewCursorTransform" />
+                                                </Grid.RenderTransform>
+                                                <Ellipse
+                                                    Fill="#F7FFFFFF"
+                                                    Stroke="{ThemeResource AppAccentStrongBrush}"
+                                                    StrokeThickness="2.5" />
+                                                <Ellipse
+                                                    Width="8"
+                                                    Height="8"
+                                                    Fill="{ThemeResource AppAccentBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Canvas>
+                                    </Grid>
+                                </Border>
+
+                                <TextBlock
+                                    x:Name="PreviewCaptionTextBlock"
+                                    Style="{StaticResource CaptionLabelTextStyle}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </Border>
 
@@ -308,6 +455,59 @@
                                             Orientation="Horizontal"
                                             Spacing="8" />
                                     </ScrollViewer>
+                                    <TextBlock
+                                        Text="Wallpapers"
+                                        Style="{StaticResource CaptionLabelTextStyle}" />
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ToggleButton
+                                            x:Name="WallpaperPresetOneButton"
+                                            Grid.Column="0"
+                                            Checked="WallpaperPresetButton_Checked"
+                                            Unchecked="WallpaperPresetButton_Unchecked">
+                                            <StackPanel Spacing="6">
+                                                <Border
+                                                    Height="88"
+                                                    CornerRadius="8"
+                                                    BorderThickness="1"
+                                                    BorderBrush="{ThemeResource AppStrokeBrush}">
+                                                    <Image
+                                                        x:Name="WallpaperPresetOneImage"
+                                                        Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock
+                                                    Text="Wallpaper 1"
+                                                    HorizontalAlignment="Center"
+                                                    Style="{StaticResource CaptionLabelTextStyle}" />
+                                            </StackPanel>
+                                        </ToggleButton>
+
+                                        <ToggleButton
+                                            x:Name="WallpaperPresetTwoButton"
+                                            Grid.Column="1"
+                                            Checked="WallpaperPresetButton_Checked"
+                                            Unchecked="WallpaperPresetButton_Unchecked">
+                                            <StackPanel Spacing="6">
+                                                <Border
+                                                    Height="88"
+                                                    CornerRadius="8"
+                                                    BorderThickness="1"
+                                                    BorderBrush="{ThemeResource AppStrokeBrush}">
+                                                    <Image
+                                                        x:Name="WallpaperPresetTwoImage"
+                                                        Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock
+                                                    Text="Wallpaper 2"
+                                                    HorizontalAlignment="Center"
+                                                    Style="{StaticResource CaptionLabelTextStyle}" />
+                                            </StackPanel>
+                                        </ToggleButton>
+                                    </Grid>
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />

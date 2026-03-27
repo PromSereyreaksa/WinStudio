@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT.Interop;
@@ -16,8 +17,12 @@ public sealed partial class RecordPage : Page
     private nint _selectedWindowHandle;
     private string? _selectedWindowTitle;
     private string _selectedBackgroundColorHex = BackgroundSettings.SlateBlue.ColorHex;
-    private string? _customBackgroundImagePath;
+    private string? _selectedBackgroundImagePath;
+    private string? _selectedBackgroundImageLabel;
     private readonly List<RadioButton> _swatchButtons = [];
+    private bool _updatingBackgroundSelection;
+    private string? _wallpaperOnePath;
+    private string? _wallpaperTwoPath;
 
     public event EventHandler<RecordRequestedEventArgs>? StartRequested;
 
@@ -30,11 +35,13 @@ public sealed partial class RecordPage : Page
         ZoomSensitivitySlider.Value = 1.2;
         FollowSpeedSlider.Value = 1.15;
         BuildBackgroundSwatches();
+        LoadBundledWallpapers();
         LoadWindowTargets();
         UpdateSegmentVisuals();
         UpdateCaptureModeUi();
         UpdateSettingsPreview();
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
         SetStatus("Pick a source and start when you are ready.");
     }
 
@@ -45,8 +52,8 @@ public sealed partial class RecordPage : Page
         BackgroundSettings background;
         if (BackgroundToggle.IsOn)
         {
-            background = !string.IsNullOrWhiteSpace(_customBackgroundImagePath)
-                ? new BackgroundSettings(BackgroundMode.Image, ImagePath: _customBackgroundImagePath)
+            background = !string.IsNullOrWhiteSpace(_selectedBackgroundImagePath)
+                ? new BackgroundSettings(BackgroundMode.Image, ImagePath: _selectedBackgroundImagePath)
                 : new BackgroundSettings(BackgroundMode.Solid, _selectedBackgroundColorHex);
         }
         else
@@ -91,6 +98,7 @@ public sealed partial class RecordPage : Page
         UpdateSegmentVisuals();
         UpdateCaptureModeUi();
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private void MonitorCaptureToggle_Checked(object sender, RoutedEventArgs e)
@@ -99,6 +107,7 @@ public sealed partial class RecordPage : Page
         UpdateSegmentVisuals();
         UpdateCaptureModeUi();
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private void WindowPickerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -106,12 +115,14 @@ public sealed partial class RecordPage : Page
         StoreSelectedWindow(WindowPickerComboBox.SelectedItem as WindowTargetOption);
         UpdateWindowSelectionHint();
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private void RefreshWindowsButton_Click(object sender, RoutedEventArgs e)
     {
         LoadWindowTargets();
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private void SettingsSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
@@ -132,6 +143,7 @@ public sealed partial class RecordPage : Page
         }
 
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private void StartRecordingButton_Click(object sender, RoutedEventArgs e)
@@ -201,6 +213,7 @@ public sealed partial class RecordPage : Page
         ZoomSensitivityPreviewTextBlock.Text = DescribeSensitivity(ZoomSensitivitySlider.Value);
         FollowSpeedPreviewTextBlock.Text = DescribeSpeed(FollowSpeedSlider.Value);
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private static string DescribeIntensity(double value)
@@ -237,15 +250,15 @@ public sealed partial class RecordPage : Page
     {
         if (value < 1.0)
         {
-            return "Cinematic";
+            return "Smooth";
         }
 
         if (value < 1.5)
         {
-            return "Snappy";
+            return "Balanced";
         }
 
-        return "Fast";
+        return "Responsive";
     }
 
     private void UpdateSegmentVisuals()
@@ -279,16 +292,51 @@ public sealed partial class RecordPage : Page
             ? Visibility.Visible
             : Visibility.Collapsed;
         UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private void BgSwatch_Checked(object sender, RoutedEventArgs e)
     {
         if (sender is RadioButton rb && rb.Tag is string hex)
         {
-            _selectedBackgroundColorHex = hex;
-            _customBackgroundImagePath = null;
-            UpdateBackgroundImageHint();
+            SelectSolidBackground(hex);
         }
+    }
+
+    private void WallpaperPresetButton_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_updatingBackgroundSelection || !IsLoaded)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(sender, WallpaperPresetOneButton) && !string.IsNullOrWhiteSpace(_wallpaperOnePath))
+        {
+            SelectBackgroundImage(_wallpaperOnePath, "Wallpaper 1");
+        }
+        else if (ReferenceEquals(sender, WallpaperPresetTwoButton) && !string.IsNullOrWhiteSpace(_wallpaperTwoPath))
+        {
+            SelectBackgroundImage(_wallpaperTwoPath, "Wallpaper 2");
+        }
+    }
+
+    private void WallpaperPresetButton_Unchecked(object sender, RoutedEventArgs e)
+    {
+        if (_updatingBackgroundSelection || !IsLoaded)
+        {
+            return;
+        }
+
+        if (WallpaperPresetOneButton.IsChecked == true || WallpaperPresetTwoButton.IsChecked == true)
+        {
+            return;
+        }
+
+        _selectedBackgroundImagePath = null;
+        _selectedBackgroundImageLabel = null;
+        UpdateBackgroundImageHint();
+        UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private async void BackgroundBrowseButton_Click(object sender, RoutedEventArgs e)
@@ -309,14 +357,7 @@ public sealed partial class RecordPage : Page
         var file = await picker.PickSingleFileAsync();
         if (file is not null)
         {
-            _customBackgroundImagePath = file.Path;
-            // Uncheck all swatches since a custom image is now active.
-            foreach (var btn in _swatchButtons)
-            {
-                btn.IsChecked = false;
-            }
-
-            UpdateBackgroundImageHint();
+            SelectBackgroundImage(file.Path, System.IO.Path.GetFileName(file.Path));
         }
     }
 
@@ -327,9 +368,9 @@ public sealed partial class RecordPage : Page
             return;
         }
 
-        BackgroundImagePathTextBlock.Text = string.IsNullOrWhiteSpace(_customBackgroundImagePath)
+        BackgroundImagePathTextBlock.Text = string.IsNullOrWhiteSpace(_selectedBackgroundImagePath)
             ? "Or pick a custom image file."
-            : System.IO.Path.GetFileName(_customBackgroundImagePath);
+            : _selectedBackgroundImageLabel ?? System.IO.Path.GetFileName(_selectedBackgroundImagePath);
     }
 
     private void BuildBackgroundSwatches()
@@ -349,6 +390,68 @@ public sealed partial class RecordPage : Page
             _swatchButtons.Add(btn);
             BackgroundSwatchContainer.Children.Add(btn);
         }
+    }
+
+    private void LoadBundledWallpapers()
+    {
+        _wallpaperOnePath = GetBundledWallpaperPath("1.jpg");
+        _wallpaperTwoPath = GetBundledWallpaperPath("2.jpg");
+
+        SetWallpaperPreview(WallpaperPresetOneButton, WallpaperPresetOneImage, _wallpaperOnePath);
+        SetWallpaperPreview(WallpaperPresetTwoButton, WallpaperPresetTwoImage, _wallpaperTwoPath);
+    }
+
+    private static string GetBundledWallpaperPath(string fileName)
+    {
+        return System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Wallpapers", fileName);
+    }
+
+    private static void SetWallpaperPreview(ToggleButton button, Image image, string? filePath)
+    {
+        var exists = !string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath);
+        button.IsEnabled = exists;
+        button.Visibility = exists ? Visibility.Visible : Visibility.Collapsed;
+
+        if (exists)
+        {
+            image.Source = new BitmapImage(new Uri(filePath!, UriKind.Absolute));
+        }
+    }
+
+    private void SelectSolidBackground(string hex)
+    {
+        _selectedBackgroundColorHex = hex;
+        _selectedBackgroundImagePath = null;
+        _selectedBackgroundImageLabel = null;
+
+        _updatingBackgroundSelection = true;
+        WallpaperPresetOneButton.IsChecked = false;
+        WallpaperPresetTwoButton.IsChecked = false;
+        _updatingBackgroundSelection = false;
+
+        UpdateBackgroundImageHint();
+        UpdateOverviewSummary();
+        UpdateRecordingPreview();
+    }
+
+    private void SelectBackgroundImage(string path, string label)
+    {
+        _selectedBackgroundImagePath = path;
+        _selectedBackgroundImageLabel = label;
+
+        foreach (var btn in _swatchButtons)
+        {
+            btn.IsChecked = false;
+        }
+
+        _updatingBackgroundSelection = true;
+        WallpaperPresetOneButton.IsChecked = string.Equals(path, _wallpaperOnePath, StringComparison.OrdinalIgnoreCase);
+        WallpaperPresetTwoButton.IsChecked = string.Equals(path, _wallpaperTwoPath, StringComparison.OrdinalIgnoreCase);
+        _updatingBackgroundSelection = false;
+
+        UpdateBackgroundImageHint();
+        UpdateOverviewSummary();
+        UpdateRecordingPreview();
     }
 
     private static Color ParseHexColor(string hex)
@@ -379,6 +482,46 @@ public sealed partial class RecordPage : Page
         StartRecordingSecondaryTextBlock.Text = GetStartButtonHelperText();
     }
 
+    private void UpdateRecordingPreview()
+    {
+        var windowMode = WindowCaptureToggle.IsChecked == true;
+        PreviewModeTextBlock.Text = windowMode ? "Window capture" : "Monitor capture";
+        PreviewWindowTitleTextBlock.Text = windowMode
+            ? ShortenTitle(_selectedWindowTitle ?? "Selected window")
+            : "Entire monitor";
+
+        if (BackgroundToggle.IsOn
+            && !string.IsNullOrWhiteSpace(_selectedBackgroundImagePath)
+            && File.Exists(_selectedBackgroundImagePath))
+        {
+            PreviewBackdropImage.Source = new BitmapImage(new Uri(_selectedBackgroundImagePath, UriKind.Absolute));
+            PreviewBackdropImage.Visibility = Visibility.Visible;
+            PreviewBackdropBorder.Background = new SolidColorBrush(ParseHexColor("#10141C"));
+        }
+        else
+        {
+            PreviewBackdropImage.Source = null;
+            PreviewBackdropImage.Visibility = Visibility.Collapsed;
+            PreviewBackdropBorder.Background = new SolidColorBrush(
+                ParseHexColor(BackgroundToggle.IsOn ? _selectedBackgroundColorHex : "#0F1115")
+            );
+        }
+
+        var intensityT = Math.Clamp((float)((ZoomIntensitySlider.Value - 0.6d) / 1.6d), 0f, 1f);
+        var followT = Math.Clamp((float)((FollowSpeedSlider.Value - 0.6d) / 1.4d), 0f, 1f);
+        var sensitivityT = Math.Clamp((float)((ZoomSensitivitySlider.Value - 0.6d) / 1.4d), 0f, 1f);
+
+        PreviewWindowFrame.Width = windowMode ? 264 - (int)(intensityT * 22f) : 284 - (int)(intensityT * 10f);
+        PreviewWindowFrame.Height = windowMode ? 150 - (int)(intensityT * 14f) : 158 - (int)(intensityT * 8f);
+        Canvas.SetLeft(PreviewCursorBadge, 132 + (followT * 108f));
+        Canvas.SetTop(PreviewCursorBadge, 96 - (intensityT * 22f));
+        PreviewCursorTransform.ScaleX = 0.92 + (sensitivityT * 0.2);
+        PreviewCursorTransform.ScaleY = 0.92 + (sensitivityT * 0.2);
+
+        PreviewCaptionTextBlock.Text =
+            $"{DescribeIntensity(ZoomIntensitySlider.Value)} zoom, {DescribeSensitivity(ZoomSensitivitySlider.Value).ToLowerInvariant()} tracking, {DescribeSpeed(FollowSpeedSlider.Value).ToLowerInvariant()} follow. Uses your current system cursor size during recording.";
+    }
+
     private string GetReadinessMessage()
     {
         if (WindowCaptureToggle.IsChecked == true && _selectedWindowHandle == nint.Zero)
@@ -394,6 +537,11 @@ public sealed partial class RecordPage : Page
         return WindowCaptureToggle.IsChecked == true
             ? "Window recordings show a short countdown before capture begins."
             : "Monitor recordings start immediately and hide the controller from the capture.";
+    }
+
+    private static string ShortenTitle(string value)
+    {
+        return value.Length <= 34 ? value : $"{value[..31]}...";
     }
 
     private static Brush GetBrush(string key)
