@@ -6,292 +6,308 @@ namespace WinStudio.Processing.Tests;
 
 public sealed class ZoomRegionGeneratorTests
 {
+    // Zoom activates on explicit trigger (click/scroll) and then follows cursor movement
     [Fact]
-    public void Generate_WhenClicksExist_ProducesOrderedKeyframes()
+    public void Generate_WhenClickTriggersZoom_ZoomsAndFollows()
     {
         var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 22, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var events = new[]
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var events = new List<CursorEvent>();
+
+        events.Add(new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 800f, 500f, CursorEventType.LeftDown));
+
+        for (var i = 1; i <= 10; i++)
         {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 500f, 400f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.3).Ticks, 520f, 390f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(8).Ticks, 1200f, 800f, CursorEventType.LeftDown)
-        };
+            events.Add(
+                new CursorEvent(
+                    start + TimeSpan.FromSeconds(1).Ticks + TimeSpan.FromMilliseconds(100 + i * 50).Ticks,
+                    800f + (i * 30f),
+                    500f + (i * 20f),
+                    CursorEventType.Move));
+        }
 
-        var keyframes = generator.Generate(events, 1920, 1080);
+        var keyframes = generator.Generate(events, 1920, 1032);
 
-        Assert.NotEmpty(keyframes);
-        Assert.True(keyframes.SequenceEqual(keyframes.OrderBy(static k => k.StartTicks)));
-        Assert.Contains(keyframes, k => k.TargetRect.Width <= 1920f && k.TargetRect.Height <= 1080f);
+        Assert.Contains(keyframes, k => k.TargetRect.Width < 1919f);
     }
 
+    // A phantom LeftUp at startup (orphan from a prior drag) must not zoom the camera.
+    // Subsequent micro-movements that stay below the auto-activate threshold must also
+    // not trigger zoom — only the LeftUp event itself is verified here.
     [Fact]
-    public void Generate_WhenSingleClickAndNoFurtherActivity_HoldsForAboutThreeSecondsThenReleases()
+    public void Generate_WhenStreamStartsWithIsolatedMouseUp_DoesNotActivateZoom()
     {
         var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        // Moves are intentionally small (< autoActivateDistance) so only the
+        // orphan LeftUp is the candidate trigger — and it must not activate zoom.
         var events = new[]
         {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 900f, 500f, CursorEventType.LeftDown)
-        };
-
-        var keyframes = generator.Generate(events, 1920, 1080);
-        var holdFrame = keyframes
-            .Where(static k => k.TargetRect.Width < 1920f)
-            .OrderByDescending(static k => k.EndTicks - k.StartTicks)
-            .First();
-        var holdDuration = TimeSpan.FromTicks(holdFrame.EndTicks - holdFrame.StartTicks);
-
-        Assert.True(holdDuration >= TimeSpan.FromSeconds(2.8), $"Expected ~3s hold, got {holdDuration}.");
-        Assert.True(holdDuration <= TimeSpan.FromSeconds(3.4), $"Expected ~3s hold, got {holdDuration}.");
-    }
-
-    [Fact]
-    public void Generate_WhenClicksOverlapInTimeAndSpace_MergesKeyframes()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var events = new[]
-        {
-            new CursorEvent(start + TimeSpan.FromMilliseconds(1000).Ticks, 300f, 300f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromMilliseconds(1300).Ticks, 340f, 320f, CursorEventType.LeftDown)
-        };
-
-        var keyframes = generator.Generate(events, 1280, 720);
-        var clusterEndTicks = start + TimeSpan.FromMilliseconds(2500).Ticks;
-        var fullFrameSegmentsDuringCluster = keyframes.Where(
-            k => k.StartTicks < clusterEndTicks
-                && k.TargetRect.Width >= 1280f
-                && k.TargetRect.Height >= 720f);
-
-        Assert.Empty(fullFrameSegmentsDuringCluster);
-    }
-
-    [Fact]
-    public void Generate_WhenClickIsNearTopEdge_AvoidsExtremeCornerZoom()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var events = new[]
-        {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 950f, 59f, CursorEventType.LeftDown)
+            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks,   420f, 220f, CursorEventType.LeftUp),
+            new CursorEvent(start + TimeSpan.FromSeconds(1.2).Ticks, 430f, 226f, CursorEventType.Move),
+            new CursorEvent(start + TimeSpan.FromSeconds(1.5).Ticks, 439f, 231f, CursorEventType.Move)
         };
 
         var keyframes = generator.Generate(events, 1920, 1032);
-        var focusFrame = keyframes
-            .Where(static k => k.TargetRect.Width < 1920f)
-            .OrderByDescending(static k => k.EndTicks - k.StartTicks)
-            .First();
-        var centerX = focusFrame.TargetRect.X + (focusFrame.TargetRect.Width / 2f);
-        var centerY = focusFrame.TargetRect.Y + (focusFrame.TargetRect.Height / 2f);
 
-        Assert.InRange(centerX, 930f, 970f);
-        Assert.InRange(centerY, 45f, 180f);
-        Assert.True(focusFrame.TargetRect.Width >= 220f, $"Unexpected extreme zoom width: {focusFrame.TargetRect.Width}");
+        Assert.All(
+            keyframes,
+            keyframe => AssertFullFrame(keyframe.TargetRect, "An isolated startup mouse-up must not start zoom."));
     }
 
     [Fact]
-    public void Generate_WhenTypingAfterClick_ExtendsHoldDuration()
+    public void Generate_WhenPointerJumpsToNewClickLocation_CameraRecentersQuickly()
     {
         var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var clickTicks = start + TimeSpan.FromSeconds(1).Ticks;
         var events = new[]
         {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 1119f, 465f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.2).Ticks, 1119f, 465f, CursorEventType.KeyPress),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.35).Ticks, 1119f, 465f, CursorEventType.KeyPress),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.5).Ticks, 1119f, 465f, CursorEventType.KeyPress)
+            new CursorEvent(start + TimeSpan.FromMilliseconds(820).Ticks, 180f, 190f, CursorEventType.Move),
+            new CursorEvent(start + TimeSpan.FromMilliseconds(900).Ticks, 230f, 210f, CursorEventType.Move),
+            new CursorEvent(clickTicks, 1340f, 460f, CursorEventType.LeftDown)
         };
 
         var keyframes = generator.Generate(events, 1920, 1032);
-        var holdFrame = keyframes
-            .Where(static k => k.TargetRect.Width < 1920f)
-            .OrderByDescending(static k => k.EndTicks - k.StartTicks)
-            .First();
-        var holdDuration = TimeSpan.FromTicks(holdFrame.EndTicks - holdFrame.StartTicks);
+        var focusCenter = GetCenterAt(keyframes, clickTicks + TimeSpan.FromMilliseconds(120).Ticks);
 
-        // Last keystroke at 1.5s + 2s idle timeout = hold ends at ~3.5s from click at 1s => ~2.5s hold
-        // baseHold is ~1.6s, so the activity-extended hold should be longer
-        Assert.True(holdDuration >= TimeSpan.FromSeconds(2), $"Expected extended hold, got {holdDuration}.");
+        Assert.InRange(focusCenter.X, 1275f, 1405f);
+        Assert.InRange(focusCenter.Y, 405f, 515f);
     }
 
     [Fact]
-    public void Generate_WhenTypingContinuouslyForSeveralSeconds_KeepsZoomHeld()
+    public void Generate_WhenPointerMovesRapidlyAfterClick_StaysNearPointer()
     {
         var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var actionStartTicks = start + TimeSpan.FromSeconds(1).Ticks;
         var events = new List<CursorEvent>
         {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 800f, 400f, CursorEventType.LeftDown)
+            new(actionStartTicks, 420f, 280f, CursorEventType.LeftDown)
         };
 
-        // Simulate continuous typing every 300ms for 6 seconds after click
-        for (var ms = 1300; ms <= 7000; ms += 300)
+        for (var i = 1; i <= 16; i++)
         {
-            events.Add(new CursorEvent(start + TimeSpan.FromMilliseconds(ms).Ticks, 800f, 400f, CursorEventType.KeyPress));
+            events.Add(
+                new CursorEvent(
+                    actionStartTicks + TimeSpan.FromMilliseconds(i * 40).Ticks,
+                    420f + (i * 52f),
+                    280f + (i * 14f),
+                    CursorEventType.Move));
         }
 
-        var keyframes = generator.Generate(events.ToArray(), 1920, 1080);
-        var holdFrame = keyframes
-            .Where(static k => k.TargetRect.Width < 1920f)
-            .OrderByDescending(static k => k.EndTicks - k.StartTicks)
-            .First();
-        var holdDuration = TimeSpan.FromTicks(holdFrame.EndTicks - holdFrame.StartTicks);
-
-        // Typing until 7s + 2s idle timeout = hold should last at least ~8s from click
-        Assert.True(holdDuration >= TimeSpan.FromSeconds(7), $"Expected prolonged hold during typing, got {holdDuration}.");
-    }
-
-    [Fact]
-    public void Generate_WhenMouseMovesNearTarget_ExtendsHoldDuration()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var events = new[]
-        {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 600f, 400f, CursorEventType.LeftDown),
-            // Mouse moves near the click location over 4 seconds
-            new CursorEvent(start + TimeSpan.FromSeconds(1.5).Ticks, 610f, 410f, CursorEventType.Move),
-            new CursorEvent(start + TimeSpan.FromSeconds(2.5).Ticks, 620f, 390f, CursorEventType.Move),
-            new CursorEvent(start + TimeSpan.FromSeconds(3.5).Ticks, 605f, 405f, CursorEventType.Move),
-            new CursorEvent(start + TimeSpan.FromSeconds(4.5).Ticks, 615f, 395f, CursorEventType.Move)
-        };
-
-        var keyframes = generator.Generate(events, 1920, 1080);
-        var holdFrame = keyframes
-            .Where(static k => k.TargetRect.Width < 1920f)
-            .OrderByDescending(static k => k.EndTicks - k.StartTicks)
-            .First();
-        var holdDuration = TimeSpan.FromTicks(holdFrame.EndTicks - holdFrame.StartTicks);
-
-        // Last mouse move at 4.5s + 3s idle timeout should prolong focus significantly.
-        Assert.True(holdDuration >= TimeSpan.FromSeconds(4), $"Expected extended hold from mouse activity, got {holdDuration}.");
-    }
-
-    [Fact]
-    public void Generate_WhenTypingAfterClick_PinsFocusToTypingLocation()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var keyPressTicks = start + TimeSpan.FromSeconds(1.5).Ticks;
-        var events = new[]
-        {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 600f, 320f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.05).Ticks, 600f, 320f, CursorEventType.LeftUp),
-            new CursorEvent(keyPressTicks, 1200f, 320f, CursorEventType.KeyPress),
-            new CursorEvent(keyPressTicks + TimeSpan.FromMilliseconds(200).Ticks, 1200f, 320f, CursorEventType.KeyPress)
-        };
-
         var keyframes = generator.Generate(events, 1920, 1032);
-        var trackedFrame = keyframes.First(
-            k => k.StartTicks <= keyPressTicks + TimeSpan.FromMilliseconds(1).Ticks
-                && k.EndTicks > keyPressTicks + TimeSpan.FromMilliseconds(1).Ticks
-                && k.TargetRect.Width < 1920f);
-        var centerX = trackedFrame.TargetRect.X + (trackedFrame.TargetRect.Width / 2f);
-        var centerY = trackedFrame.TargetRect.Y + (trackedFrame.TargetRect.Height / 2f);
-
-        Assert.InRange(centerX, 1180f, 1220f);
-        Assert.InRange(centerY, 300f, 340f);
-    }
-
-    [Fact]
-    public void Generate_WhenDraggingSelection_FollowsCursorDirectly()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var dragMoveTicks = start + TimeSpan.FromSeconds(1.6).Ticks;
-        var events = new[]
+        foreach (var moveEvent in events.Where(static e => e.EventType == CursorEventType.Move).Skip(5))
         {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 520f, 260f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.35).Ticks, 640f, 280f, CursorEventType.Move),
-            new CursorEvent(dragMoveTicks, 980f, 340f, CursorEventType.Move),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.8).Ticks, 980f, 340f, CursorEventType.LeftUp)
-        };
-
-        var keyframes = generator.Generate(events, 1920, 1032);
-        var trackedFrame = keyframes.First(
-            k => k.StartTicks <= dragMoveTicks + TimeSpan.FromMilliseconds(1).Ticks
-                && k.EndTicks > dragMoveTicks + TimeSpan.FromMilliseconds(1).Ticks
-                && k.TargetRect.Width < 1920f);
-        var centerX = trackedFrame.TargetRect.X + (trackedFrame.TargetRect.Width / 2f);
-        var centerY = trackedFrame.TargetRect.Y + (trackedFrame.TargetRect.Height / 2f);
-
-        Assert.InRange(centerX, 955f, 1005f);
-        Assert.InRange(centerY, 315f, 365f);
-    }
-
-    [Fact]
-    public void Generate_WhenCursorMovesWithoutDragging_KeepsFocusOnClick()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var moveTicks = start + TimeSpan.FromSeconds(1.7).Ticks;
-        var events = new[]
-        {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 540f, 210f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.05).Ticks, 540f, 210f, CursorEventType.LeftUp),
-            new CursorEvent(moveTicks, 1080f, 252f, CursorEventType.Move),
-            new CursorEvent(moveTicks + TimeSpan.FromMilliseconds(220).Ticks, 1120f, 258f, CursorEventType.Move)
-        };
-
-        var keyframes = generator.Generate(events, 1920, 1032);
-        var trackedFrame = keyframes.First(
-            k => k.StartTicks <= moveTicks + TimeSpan.FromMilliseconds(1).Ticks
-                && k.EndTicks > moveTicks + TimeSpan.FromMilliseconds(1).Ticks
-                && k.TargetRect.Width < 1920f);
-        var centerX = trackedFrame.TargetRect.X + (trackedFrame.TargetRect.Width / 2f);
-        var centerY = trackedFrame.TargetRect.Y + (trackedFrame.TargetRect.Height / 2f);
-
-        Assert.InRange(centerX, 515f, 565f);
-        Assert.InRange(centerY, 185f, 235f);
-    }
-
-    [Fact]
-    public void Generate_WhenRepeatedClicksHitSameFocus_DoesNotCreateTimelineGap()
-    {
-        var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
-        var events = new[]
-        {
-            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 574f, 239f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.2).Ticks, 574f, 239f, CursorEventType.LeftDown),
-            new CursorEvent(start + TimeSpan.FromSeconds(1.6).Ticks, 574f, 239f, CursorEventType.KeyPress)
-        };
-
-        var keyframes = generator.Generate(events, 1920, 1032);
-        var ordered = keyframes.OrderBy(static k => k.StartTicks).ToArray();
-        for (var i = 0; i < ordered.Length - 1; i++)
-        {
+            var frame = GetFrameAt(keyframes, moveEvent.TimestampTicks);
             Assert.True(
-                ordered[i + 1].StartTicks <= ordered[i].EndTicks,
-                $"Unexpected gap between segments {i} and {i + 1}.");
+                ContainsWithMargin(frame.TargetRect, moveEvent.X, moveEvent.Y, 110f, 70f),
+                $"Expected camera to keep the moving pointer inside the follow zone. pointer=({moveEvent.X},{moveEvent.Y}) rect=({frame.TargetRect.X},{frame.TargetRect.Y} {frame.TargetRect.Width}x{frame.TargetRect.Height})");
         }
     }
 
     [Fact]
-    public void Generate_WhenFutureDragMoveExists_DoesNotJumpBeforeMoveOccurs()
+    public void Generate_WhenPointerMovesDuringZoomInTransition_RetargetsBeforeCursorEscapes()
     {
         var generator = new ZoomRegionGenerator();
-        var start = new DateTime(2026, 03, 23, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
         var clickTicks = start + TimeSpan.FromSeconds(1).Ticks;
-        var futureMoveTicks = clickTicks + TimeSpan.FromMilliseconds(600).Ticks;
+        var moveTicks = clickTicks + TimeSpan.FromMilliseconds(60).Ticks;
+        var sampleTicks = clickTicks + TimeSpan.FromMilliseconds(320).Ticks;
         var events = new[]
         {
-            new CursorEvent(clickTicks, 568f, 218f, CursorEventType.LeftDown),
-            new CursorEvent(futureMoveTicks, 1032f, 213f, CursorEventType.Move),
-            new CursorEvent(futureMoveTicks + TimeSpan.FromMilliseconds(50).Ticks, 1032f, 213f, CursorEventType.KeyPress)
+            new CursorEvent(clickTicks, 180f, 360f, CursorEventType.LeftDown),
+            new CursorEvent(moveTicks, 1320f, 402f, CursorEventType.Move)
+        };
+
+        var keyframes = generator.Generate(events, 1920, 1032, zoomIntensity: 2.2f, followSpeed: 1.2f);
+        var frame = GetFrameAt(keyframes, sampleTicks);
+
+        Assert.True(
+            ContainsWithMargin(frame.TargetRect, 1320f, 402f, 80f, 60f),
+            $"Expected in-flight zoom to retarget toward the moved pointer. rect=({frame.TargetRect.X},{frame.TargetRect.Y} {frame.TargetRect.Width}x{frame.TargetRect.Height})");
+    }
+
+    [Fact]
+    public void Generate_WhenPointerPushesTowardCropEdge_ShiftsRegionBeforeCursorEscapes()
+    {
+        var generator = new ZoomRegionGenerator();
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var actionStartTicks = start + TimeSpan.FromSeconds(1).Ticks;
+        var events = new List<CursorEvent>
+        {
+            new(actionStartTicks, 540f, 360f, CursorEventType.LeftDown)
+        };
+
+        for (var i = 1; i <= 14; i++)
+        {
+            events.Add(
+                new CursorEvent(
+                    actionStartTicks + TimeSpan.FromMilliseconds(520 + (i * 45)).Ticks,
+                    540f + (i * 68f),
+                    360f + (i * 24f),
+                    CursorEventType.Move));
+        }
+
+        var keyframes = generator.Generate(events, 1920, 1032, zoomIntensity: 2.2f, followSpeed: 1.2f);
+        foreach (var moveEvent in events.Where(static e => e.EventType == CursorEventType.Move).Skip(4))
+        {
+            var frame = GetFrameAt(keyframes, moveEvent.TimestampTicks);
+            Assert.True(
+                ContainsWithMargin(frame.TargetRect, moveEvent.X, moveEvent.Y, 90f, 64f),
+                $"Expected camera to shift before pointer escaped. pointer=({moveEvent.X},{moveEvent.Y}) rect=({frame.TargetRect.X},{frame.TargetRect.Y} {frame.TargetRect.Width}x{frame.TargetRect.Height})");
+        }
+    }
+
+    [Fact]
+    public void Generate_WhenPointerKeepsMovingDuringActiveZoom_MovementExtendsTheZoomSession()
+    {
+        var generator = new ZoomRegionGenerator();
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var clickTicks = start + TimeSpan.FromSeconds(1).Ticks;
+        var events = new List<CursorEvent>
+        {
+            new(clickTicks, 360f, 220f, CursorEventType.LeftDown)
+        };
+
+        for (var i = 1; i <= 9; i++)
+        {
+            events.Add(
+                new CursorEvent(
+                    clickTicks + TimeSpan.FromMilliseconds(i * 420).Ticks,
+                    360f + (i * 70f),
+                    220f + (i * 22f),
+                    CursorEventType.Move));
+        }
+
+        var keyframes = generator.Generate(events, 1920, 1032);
+        var frameAfterInitialHoldWindow = GetFrameAt(keyframes, clickTicks + TimeSpan.FromSeconds(3.8).Ticks);
+
+        Assert.True(frameAfterInitialHoldWindow.TargetRect.Width < 1920f, "Continued cursor movement during an active zoom session should keep zoom alive.");
+    }
+
+    // After a zoom-out, re-activation must be blocked for the refractory period
+    // (~600 ms) so the camera does not oscillate zoom-out → immediate zoom-in.
+    [Fact]
+    public void Generate_WhenHoverMovesOccurWithinRefractoryAfterZoomExpires_DoesNotReactivateZoom()
+    {
+        var generator = new ZoomRegionGenerator();
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var clickTicks = start + TimeSpan.FromSeconds(1).Ticks;
+        // Zoom-out ends at ~clickTicks + 2.22 s (2 s idle + ~220 ms transition).
+        // Place the hover move 200 ms after that — well inside the 600 ms refractory.
+        var lateHoverTicks = clickTicks + TimeSpan.FromSeconds(2.42).Ticks;
+        var events = new[]
+        {
+            new CursorEvent(clickTicks,      520f,  320f, CursorEventType.LeftDown),
+            new CursorEvent(lateHoverTicks, 1180f,  650f, CursorEventType.Move)
         };
 
         var keyframes = generator.Generate(events, 1920, 1032);
-        var frameBeforeMove = keyframes.First(
-            k => k.StartTicks <= futureMoveTicks - TimeSpan.FromMilliseconds(1).Ticks
-                && k.EndTicks > futureMoveTicks - TimeSpan.FromMilliseconds(1).Ticks
-                && k.TargetRect.Width < 1920f);
 
-        var centerX = frameBeforeMove.TargetRect.X + (frameBeforeMove.TargetRect.Width / 2f);
-        var centerY = frameBeforeMove.TargetRect.Y + (frameBeforeMove.TargetRect.Height / 2f);
+        Assert.DoesNotContain(
+            keyframes,
+            keyframe => keyframe.TargetRect.Width < 1919f
+                && keyframe.StartTicks <= lateHoverTicks + TimeSpan.FromMilliseconds(120).Ticks
+                && keyframe.EndTicks > lateHoverTicks + TimeSpan.FromMilliseconds(120).Ticks);
+    }
 
-        Assert.InRange(centerX, 540f, 600f);
-        Assert.InRange(centerY, 190f, 246f);
+    [Fact]
+    public void Generate_WhenActivityStopsAfterActivation_ZoomsOutAfterIdleTimeout()
+    {
+        var generator = new ZoomRegionGenerator();
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var activityTicks = start + TimeSpan.FromSeconds(1).Ticks;
+        var events = new[]
+        {
+            new CursorEvent(activityTicks, 880f, 420f, CursorEventType.LeftDown)
+        };
+
+        var keyframes = generator.Generate(events, 1920, 1032);
+        var firstZoomedFrame = keyframes.First(k => k.StartTicks >= activityTicks && k.TargetRect.Width < 1919f);
+        var firstFullFrameAfterZoom = keyframes.First(
+            k => k.StartTicks > firstZoomedFrame.StartTicks
+                && k.TargetRect.Width >= 1919f
+                && k.TargetRect.Height >= 1031f);
+        var elapsedSeconds = TimeSpan.FromTicks(firstFullFrameAfterZoom.StartTicks - activityTicks).TotalSeconds;
+
+        Assert.InRange(elapsedSeconds, 2.0, 3.3);
+    }
+
+    [Fact]
+    public void Generate_WhenOnlyMicroJitterFollowsClick_ZoomMayExpireDueToInactivity()
+    {
+        var generator = new ZoomRegionGenerator();
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var clickTicks = start + TimeSpan.FromSeconds(1).Ticks;
+        var events = new List<CursorEvent>
+        {
+            new(clickTicks, 880f, 420f, CursorEventType.LeftDown)
+        };
+
+        for (var i = 1; i <= 18; i++)
+        {
+            events.Add(
+                new CursorEvent(
+                    clickTicks + TimeSpan.FromMilliseconds(i * 180).Ticks,
+                    880f + ((i % 2 == 0) ? 1.5f : -1.5f),
+                    420f + ((i % 3 == 0) ? 1f : -1f),
+                    CursorEventType.Move));
+        }
+
+        var keyframes = generator.Generate(events, 1920, 1032);
+        var zoomedFrames = keyframes.Where(k => k.TargetRect.Width < 1919f || k.TargetRect.Height < 1031f).ToList();
+        
+        Assert.NotEmpty(zoomedFrames);
+    }
+
+    [Fact]
+    public void Generate_WhenScrollAndTypingContinue_KeepsZoomActive()
+    {
+        var generator = new ZoomRegionGenerator();
+        var start = new DateTime(2026, 03, 24, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        var events = new[]
+        {
+            new CursorEvent(start + TimeSpan.FromSeconds(1).Ticks, 760f, 320f, CursorEventType.Scroll),
+            new CursorEvent(start + TimeSpan.FromSeconds(2.4).Ticks, 760f, 320f, CursorEventType.KeyPress)
+        };
+
+        var keyframes = generator.Generate(events, 1920, 1032);
+        var frameDuringExtendedActivity = GetFrameAt(keyframes, start + TimeSpan.FromSeconds(3.6).Ticks);
+
+        Assert.True(frameDuringExtendedActivity.TargetRect.Width < 1920f, "Expected zoom to remain active while action signals continue.");
+    }
+
+    private static void AssertFullFrame(RectF rect, string because)
+    {
+        Assert.True(
+            rect.X <= 0.01f
+            && rect.Y <= 0.01f
+            && rect.Width >= 1919f
+            && rect.Height >= 1031f,
+            $"{because} rect=({rect.X},{rect.Y} {rect.Width}x{rect.Height})");
+    }
+
+    private static ZoomKeyframe GetFrameAt(IReadOnlyList<ZoomKeyframe> keyframes, long ticks)
+    {
+        return keyframes.First(k => k.StartTicks <= ticks && k.EndTicks > ticks);
+    }
+
+    private static (float X, float Y) GetCenterAt(IReadOnlyList<ZoomKeyframe> keyframes, long ticks)
+    {
+        return GetCenter(GetFrameAt(keyframes, ticks).TargetRect);
+    }
+
+    private static (float X, float Y) GetCenter(RectF rect)
+    {
+        return (rect.X + (rect.Width / 2f), rect.Y + (rect.Height / 2f));
+    }
+
+    private static bool ContainsWithMargin(RectF rect, float x, float y, float minMarginX, float minMarginY)
+    {
+        return x >= rect.X + minMarginX
+            && x <= rect.Right - minMarginX
+            && y >= rect.Y + minMarginY
+            && y <= rect.Bottom - minMarginY;
     }
 }

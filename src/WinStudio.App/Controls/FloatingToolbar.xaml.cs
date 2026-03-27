@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+
 namespace WinStudio.App.Controls;
 
 public sealed partial class FloatingToolbar : Window
@@ -32,6 +34,7 @@ public sealed partial class FloatingToolbar : Window
         };
 
         Closed += FloatingToolbar_Closed;
+        ApplyStateVisuals();
     }
 
     public bool IsPaused => _isPaused;
@@ -41,9 +44,9 @@ public sealed partial class FloatingToolbar : Window
         _elapsed = TimeSpan.Zero;
         _lastResumeUtc = DateTimeOffset.UtcNow;
         _isPaused = false;
-        PauseGlyphTextBlock.Text = "||";
         _timer.Start();
         StartPulse();
+        ApplyStateVisuals();
         UpdateElapsedDisplay();
     }
 
@@ -63,16 +66,17 @@ public sealed partial class FloatingToolbar : Window
                 _lastResumeUtc = null;
             }
 
-            PauseGlyphTextBlock.Text = "▶";
+            _timer.Stop();
             StopPulse();
         }
         else
         {
             _lastResumeUtc = DateTimeOffset.UtcNow;
-            PauseGlyphTextBlock.Text = "||";
+            _timer.Start();
             StartPulse();
         }
 
+        ApplyStateVisuals();
         UpdateElapsedDisplay();
     }
 
@@ -142,5 +146,26 @@ public sealed partial class FloatingToolbar : Window
         }
 
         ElapsedTextBlock.Text = current.ToString(@"hh\:mm\:ss");
+    }
+
+    private void ApplyStateVisuals()
+    {
+        if (_isPaused)
+        {
+            PauseGlyphTextBlock.Text = ">";
+            StateBadgeTextBlock.Text = "PAUSE";
+            RecordingDot.Fill = GetBrush("AppWarningBrush");
+        }
+        else
+        {
+            PauseGlyphTextBlock.Text = "||";
+            StateBadgeTextBlock.Text = "REC";
+            RecordingDot.Fill = GetBrush("AppDangerBrush");
+        }
+    }
+
+    private static Brush GetBrush(string key)
+    {
+        return (Brush)Application.Current.Resources[key];
     }
 }

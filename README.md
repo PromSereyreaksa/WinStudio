@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="public/icons/WinStudio_1.jpg" alt="WinStudio" height="80" />
+  <img src=".github/assets/icons/WinStudio_1.jpg" alt="WinStudio" height="80" />
   <br/><br/>
 
   <h1>WinStudio</h1>
@@ -11,15 +11,11 @@
 
   <br/>
 
-  <img src="public/demo/1.png" alt="WinStudio demo" width="860" />
-
   [![.NET](https://img.shields.io/badge/.NET_8-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
   [![WinUI](https://img.shields.io/badge/WinUI_3-0078D4?style=flat-square&logo=windows&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
   [![Windows App SDK](https://img.shields.io/badge/Windows_App_SDK_1.8-0078D4?style=flat-square&logo=windows11&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/)
   [![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white)](https://ffmpeg.org/)
   [![Platform](https://img.shields.io/badge/Windows_10_11-0078D4?style=flat-square&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
-
-  <br/><br/>
 
   <a href="#overview">Overview</a> |
   <a href="#getting-started">Getting Started</a> |
@@ -28,9 +24,15 @@
   <a href="#tech-stack">Tech Stack</a> |
   <a href="#contributing">Contributing</a>
 
-</div>
+  <img src=".github/assets/demo/1.gif" alt="WinStudio demo" width="860" />
 
----
+  
+
+  
+
+
+
+</div>
 
 ## Overview
 
@@ -141,5 +143,5 @@ note any output artifacts you inspected.
 
 <div align="center">
   <br/>
-  <p><em>"Record once. Ship it."</em></p>
+  <p><em>"Thank you"</em></p>
 </div>

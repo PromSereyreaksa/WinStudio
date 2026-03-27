@@ -7,138 +7,120 @@
     mc:Ignorable="d">
     <Grid Background="Transparent">
         <Border
-            Background="#CC1A1A1A"
-            BorderBrush="#FF2A2A2A"
+            Background="{ThemeResource AppFloatingToolbarBrush}"
+            BorderBrush="{ThemeResource AppStrokeBrush}"
             BorderThickness="1"
-            CornerRadius="9999"
-            Padding="10,8">
-            <Grid ColumnSpacing="10" VerticalAlignment="Center">
+            CornerRadius="4"
+            Padding="8,6">
+            <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button
-                    x:Name="CancelButton"
+                <Rectangle
+                    x:Name="RecordingDot"
                     Grid.Column="0"
-                    Width="28"
-                    Height="28"
-                    CornerRadius="14"
-                    Background="#FF1F1F1F"
-                    Foreground="#FF888888"
-                    BorderBrush="#FF2A2A2A"
-                    BorderThickness="1"
-                    Click="CancelButton_Click"
-                    ToolTipService.ToolTip="Cancel recording">
-                    <TextBlock Text="&#x2715;" FontSize="12" />
-                </Button>
+                    Width="8"
+                    Height="8"
+                    Fill="{ThemeResource AppDangerBrush}"
+                    VerticalAlignment="Center" />
 
-                <Rectangle
+                <TextBlock
+                    x:Name="StateBadgeTextBlock"
                     Grid.Column="1"
-                    Width="1"
-                    Height="20"
-                    Fill="#FF2A2A2A" />
+                    Text="REC"
+                    FontFamily="Cascadia Mono"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AppTextBrush}"
+                    VerticalAlignment="Center" />
 
-                <StackPanel
+                <TextBlock
+                    x:Name="ElapsedTextBlock"
                     Grid.Column="2"
-                    Orientation="Horizontal"
-                    Spacing="8"
-                    VerticalAlignment="Center">
-                    <Ellipse
-                        x:Name="RecordingDot"
-                        Width="8"
-                        Height="8"
-                        Fill="#FFE84040" />
-                    <TextBlock
-                        x:Name="ElapsedTextBlock"
-                        Text="00:00:00"
-                        FontFamily="Cascadia Mono"
-                        FontSize="14"
-                        FontWeight="SemiBold"
-                        Foreground="#FFF0F0F0" />
-                </StackPanel>
-
-                <Rectangle
-                    Grid.Column="3"
-                    Width="1"
-                    Height="20"
-                    Fill="#FF2A2A2A" />
+                    Text="00:00:00"
+                    FontFamily="Cascadia Mono"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AppTextBrush}"
+                    VerticalAlignment="Center" />
 
                 <Button
                     x:Name="PauseButton"
-                    Grid.Column="4"
-                    Width="28"
-                    Height="28"
-                    CornerRadius="14"
-                    Background="#FF1F1F1F"
-                    Foreground="#FF888888"
-                    BorderBrush="#FF2A2A2A"
-                    BorderThickness="1"
+                    Grid.Column="3"
+                    Style="{StaticResource ToolbarButtonStyle}"
                     Click="PauseButton_Click"
                     ToolTipService.ToolTip="Pause (Ctrl+Shift+P)">
-                    <TextBlock x:Name="PauseGlyphTextBlock" Text="||" FontSize="12" />
+                    <TextBlock
+                        x:Name="PauseGlyphTextBlock"
+                        Text="||"
+                        FontFamily="Cascadia Mono"
+                        FontSize="12"
+                        FontWeight="SemiBold" />
                 </Button>
-
-                <Button
-                    Grid.Column="5"
-                    Width="28"
-                    Height="28"
-                    CornerRadius="14"
-                    Background="#FF1F1F1F"
-                    Foreground="#FF888888"
-                    BorderBrush="#FF2A2A2A"
-                    BorderThickness="1"
-                    IsEnabled="False"
-                    Opacity="0.35"
-                    ToolTipService.ToolTip="Microphone (coming soon)">
-                    <FontIcon Glyph="&#xE720;" FontSize="12" />
-                </Button>
-
-                <Rectangle
-                    Grid.Column="6"
-                    Width="1"
-                    Height="20"
-                    Fill="#FF2A2A2A" />
 
                 <Button
                     x:Name="StopButton"
-                    Grid.Column="7"
-                    Width="32"
-                    Height="32"
-                    CornerRadius="16"
-                    Background="#FFE84040"
-                    Foreground="White"
-                    BorderBrush="#FFE84040"
-                    BorderThickness="1"
-                    Padding="0"
+                    Grid.Column="4"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    Background="{ThemeResource AppDangerBrush}"
+                    BorderBrush="{ThemeResource AppDangerBrush}"
+                    Foreground="{ThemeResource AppOnAccentBrush}"
                     Click="StopButton_Click"
                     ToolTipService.ToolTip="Stop and save (Ctrl+Shift+R)">
-                    <TextBlock Text="&#x25A0;" FontSize="11" />
+                    <TextBlock
+                        Text="[]"
+                        FontFamily="Cascadia Mono"
+                        FontSize="10"
+                        FontWeight="SemiBold" />
+                </Button>
+
+                <Button
+                    x:Name="CancelButton"
+                    Grid.Column="5"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    Click="CancelButton_Click"
+                    ToolTipService.ToolTip="Cancel recording">
+                    <TextBlock
+                        Text="X"
+                        FontFamily="Cascadia Mono"
+                        FontSize="11"
+                        FontWeight="SemiBold" />
                 </Button>
             </Grid>
         </Border>
 
         <Border
             x:Name="CountdownOverlay"
-            Background="#CC0D0D0D"
-            CornerRadius="14"
-            Padding="16,8"
+            Background="{ThemeResource AppOverlayBrush}"
+            BorderBrush="{ThemeResource AppStrokeBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Padding="14,10"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Visibility="Collapsed">
-            <TextBlock
-                x:Name="CountdownTextBlock"
-                Text="3"
-                FontFamily="Cascadia Mono"
-                FontSize="24"
-                FontWeight="SemiBold"
-                Foreground="#FFF0F0F0" />
+            <StackPanel Spacing="4">
+                <TextBlock
+                    Text="Starting"
+                    FontFamily="Segoe UI Variable"
+                    FontSize="11"
+                    Foreground="{ThemeResource AppMutedTextBrush}"
+                    HorizontalAlignment="Center" />
+                <TextBlock
+                    x:Name="CountdownTextBlock"
+                    Text="3"
+                    FontFamily="Cascadia Mono"
+                    FontSize="28"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AppTextBrush}"
+                    HorizontalAlignment="Center" />
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

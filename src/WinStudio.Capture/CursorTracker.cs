@@ -66,6 +66,11 @@ public sealed class CursorTracker : IDisposable
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out POINT lpPoint);
 
+    // GetPhysicalCursorPos always returns physical-pixel coordinates regardless of DPI awareness,
+    // matching the MSLLHOOKSTRUCT.pt values used by the mouse hook.
+    [DllImport("user32.dll")]
+    private static extern bool GetPhysicalCursorPos(out POINT lpPoint);
+
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
         _isRunning = true;
@@ -160,7 +165,10 @@ public sealed class CursorTracker : IDisposable
             var msg = (int)wParam;
             if (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
             {
-                GetCursorPos(out POINT pt);
+                // Use GetPhysicalCursorPos so the coordinates are in physical pixels,
+                // matching MSLLHOOKSTRUCT.pt from the mouse hook and the capture origin
+                // resolved by CaptureCoordinator (DWMWA_EXTENDED_FRAME_BOUNDS is also physical).
+                GetPhysicalCursorPos(out POINT pt);
                 var x = (float)(pt.X - CaptureOriginX);
                 var y = (float)(pt.Y - CaptureOriginY);
                 lock (_sync)

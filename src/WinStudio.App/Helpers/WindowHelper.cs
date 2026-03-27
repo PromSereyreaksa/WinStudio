@@ -25,7 +25,7 @@ public static class WindowHelper
 
     public static void ConfigureRecordWindow(Window window)
     {
-        const int effectiveWidth = 920;
+        const int effectiveWidth = 860;
         const int effectiveHeight = 760;
 
         try
@@ -54,8 +54,8 @@ public static class WindowHelper
     public static void ConfigureFloatingToolbar(
         Window window,
         nint avoidWindowHandle = 0,
-        int effectiveWidth = 560,
-        int effectiveHeight = 84,
+        int effectiveWidth = 360,
+        int effectiveHeight = 54,
         int effectiveMargin = 20)
     {
         try

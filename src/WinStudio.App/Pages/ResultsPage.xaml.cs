@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using System.Diagnostics;
 using Windows.Media.Core;
-using Windows.UI;
 using WinStudio.App.Models;
 
 namespace WinStudio.App.Pages;
@@ -24,8 +23,11 @@ public sealed partial class ResultsPage : Page
     public void LoadResult(RecordingResult result)
     {
         _result = result;
+        var zoomStatus = result.ZoomKeyframeCount > 0
+            ? $"{result.ZoomKeyframeCount} zoom keyframes"
+            : "no zoom (try clicking during recording)";
         SummaryTextBlock.Text =
-            $"Duration {result.Duration:mm\\:ss}  •  Cursor events {result.CursorEventCount}  •  Zoom keyframes {result.ZoomKeyframeCount}";
+            $"Duration {result.Duration:mm\\:ss} | {result.CursorEventCount} cursor events | {zoomStatus}";
         EditedPathTextBlock.Text = result.VideoPath;
         RawPathTextBlock.Text = result.RawVideoPath;
         DataPathTextBlock.Text = $"{result.CursorLogPath}\n{result.ZoomKeyframesPath}";
@@ -167,9 +169,14 @@ public sealed partial class ResultsPage : Page
 
     private static void ApplyToggleStyle(ToggleButton toggle, bool selected)
     {
-        toggle.Background = new SolidColorBrush(selected ? Color.FromArgb(255, 0, 120, 212) : Color.FromArgb(255, 31, 31, 31));
-        toggle.BorderBrush = new SolidColorBrush(selected ? Color.FromArgb(255, 0, 120, 212) : Color.FromArgb(255, 42, 42, 42));
-        toggle.Foreground = new SolidColorBrush(selected ? Microsoft.UI.Colors.White : Color.FromArgb(255, 154, 154, 154));
+        toggle.Background = GetBrush(selected ? "AppAccentBrush" : "AppSurfaceRaisedBrush");
+        toggle.BorderBrush = GetBrush(selected ? "AppAccentStrongBrush" : "AppStrokeBrush");
+        toggle.Foreground = GetBrush(selected ? "AppOnAccentBrush" : "AppSubtleTextBrush");
+    }
+
+    private static Brush GetBrush(string key)
+    {
+        return (Brush)Application.Current.Resources[key];
     }
 
     private static void OpenPath(string path)
