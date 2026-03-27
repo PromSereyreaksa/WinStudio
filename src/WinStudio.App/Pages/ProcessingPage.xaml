@@ -5,40 +5,51 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <Grid Background="#FF0D0D0D">
-        <StackPanel
+    <Grid Background="{ThemeResource AppPageBackgroundBrush}">
+        <Ellipse
+            Width="280"
+            Height="280"
+            Margin="0,-120,-120,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Fill="{ThemeResource AppAccentGlowBrush}"
+            IsHitTestVisible="False" />
+
+        <Border
+            Style="{StaticResource HeroSurfaceStyle}"
+            Width="420"
             HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Spacing="12"
-            Width="280">
-            <ProgressRing
-                IsActive="True"
-                Width="48"
-                Height="48"
-                Foreground="#FF0078D4"
-                HorizontalAlignment="Center" />
-            <TextBlock
-                x:Name="StatusTextBlock"
-                Text="Processing recording..."
-                TextAlignment="Center"
-                FontFamily="Segoe UI Variable"
-                FontSize="14"
-                FontWeight="SemiBold"
-                Foreground="#FFF0F0F0" />
-            <ProgressBar
-                x:Name="ProcessingProgressBar"
-                IsIndeterminate="True"
-                Minimum="0"
-                Maximum="100"
-                Height="8"
-                Foreground="#FF0078D4" />
-            <TextBlock
-                x:Name="ProgressTextBlock"
-                Text="Preparing zoom and cursor metadata..."
-                TextAlignment="Center"
-                FontFamily="Segoe UI Variable"
-                FontSize="12"
-                Foreground="#FF888888" />
-        </StackPanel>
+            VerticalAlignment="Center">
+            <StackPanel Spacing="14">
+                <TextBlock
+                    Text="PROCESSING"
+                    Style="{StaticResource SectionEyebrowTextStyle}" />
+                <TextBlock
+                    x:Name="StatusTextBlock"
+                    Text="Processing recording..."
+                    Style="{StaticResource SectionTitleTextStyle}" />
+                <TextBlock
+                    Text="WinStudio is building the edited output and writing the final files."
+                    Style="{StaticResource SectionBodyTextStyle}" />
+                <ProgressRing
+                    IsActive="True"
+                    Width="52"
+                    Height="52"
+                    Foreground="{ThemeResource AppAccentBrush}"
+                    HorizontalAlignment="Center" />
+                <ProgressBar
+                    x:Name="ProcessingProgressBar"
+                    IsIndeterminate="True"
+                    Minimum="0"
+                    Maximum="100"
+                    Height="8"
+                    Foreground="{ThemeResource AppAccentBrush}" />
+                <TextBlock
+                    x:Name="ProgressTextBlock"
+                    Text="Preparing zoom and cursor metadata..."
+                    Style="{StaticResource CaptionLabelTextStyle}"
+                    TextAlignment="Center" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

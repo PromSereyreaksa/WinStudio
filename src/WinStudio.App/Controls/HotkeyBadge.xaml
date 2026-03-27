@@ -10,7 +10,7 @@
             Text="{x:Bind Label, Mode=OneWay}"
             FontFamily="Segoe UI Variable"
             FontSize="12"
-            Foreground="#FF888888"
+            Foreground="{ThemeResource AppSubtleTextBrush}"
             VerticalAlignment="Center" />
         <StackPanel
             x:Name="KeysPanel"

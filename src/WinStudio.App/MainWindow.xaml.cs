@@ -122,6 +122,12 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
+            if (string.Equals(options.CaptureTarget, "Window", StringComparison.OrdinalIgnoreCase)
+                && options.SelectedWindowHandle == nint.Zero)
+            {
+                throw new InvalidOperationException("Select a window before starting a window capture.");
+            }
+
             _state = RecordingState.Starting;
             _sessionCts = new CancellationTokenSource();
             _recordPage.SetBusy(true);
@@ -135,17 +141,11 @@ public sealed partial class MainWindow : Window
             WindowHelper.ConfigureFloatingToolbar(_floatingToolbar, avoidHandle);
             WindowHelper.GetAppWindow(this).Hide();
 
-            if (string.Equals(options.CaptureTarget, "Window", StringComparison.OrdinalIgnoreCase))
-            {
-                await _floatingToolbar.RunCountdownAsync(3, _sessionCts.Token).ConfigureAwait(true);
-            }
+            // Run countdown for all capture types — user needs visual feedback before recording starts
+            await _floatingToolbar.RunCountdownAsync(3, _sessionCts.Token).ConfigureAwait(true);
 
             await _recorderService.StartAsync(options, _sessionCts.Token).ConfigureAwait(true);
             _floatingToolbar.StartClock();
-            if (!string.Equals(options.CaptureTarget, "Window", StringComparison.OrdinalIgnoreCase))
-            {
-                WindowHelper.GetAppWindow(_floatingToolbar).Hide();
-            }
 
             _state = RecordingState.Recording;
         }

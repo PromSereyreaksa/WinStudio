@@ -6,26 +6,42 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="WinStudio">
-    <Grid Background="#FF0D0D0D">
+    <Grid Background="{ThemeResource AppPageBackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="36" />
+            <RowDefinition Height="44" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid
-            x:Name="TitleBarDragRegion"
+        <Border
             Grid.Row="0"
-            Padding="12,0,0,0"
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch">
-            <TextBlock
-                Text="WinStudio"
-                FontFamily="Segoe UI Variable"
-                FontSize="14"
-                FontWeight="SemiBold"
-                Foreground="#FF888888"
-                VerticalAlignment="Center" />
-        </Grid>
+            Background="{ThemeResource AppTitleBarBrush}"
+            BorderBrush="{ThemeResource AppStrokeBrush}"
+            BorderThickness="0,0,0,1">
+            <Grid
+                x:Name="TitleBarDragRegion"
+                Padding="14,0,14,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Text="WinStudio"
+                    FontFamily="Segoe UI Variable"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AppTextBrush}"
+                    VerticalAlignment="Center" />
+
+                <TextBlock
+                    Grid.Column="1"
+                    Text="Recorder"
+                    FontFamily="Segoe UI Variable"
+                    FontSize="11"
+                    Foreground="{ThemeResource AppMutedTextBrush}"
+                    VerticalAlignment="Center" />
+            </Grid>
+        </Border>
 
         <Frame x:Name="RootFrame" Grid.Row="1" />
     </Grid>

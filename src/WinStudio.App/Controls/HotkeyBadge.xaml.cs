@@ -1,16 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
+
 namespace WinStudio.App.Controls;
 
 public sealed partial class HotkeyBadge : UserControl
 {
-    private static readonly Brush BadgeBackgroundBrush = new SolidColorBrush(Color.FromArgb(255, 31, 31, 31));
-    private static readonly Brush BadgeBorderBrush = new SolidColorBrush(Color.FromArgb(255, 42, 42, 42));
-    private static readonly Brush BadgeTextBrush = new SolidColorBrush(Color.FromArgb(255, 240, 240, 240));
-    private static readonly Brush SeparatorBrush = new SolidColorBrush(Color.FromArgb(255, 85, 85, 85));
-
     public static readonly DependencyProperty LabelProperty =
         DependencyProperty.Register(
             nameof(Label),
@@ -65,7 +60,7 @@ public sealed partial class HotkeyBadge : UserControl
                 KeysPanel.Children.Add(new TextBlock
                 {
                     Text = "+",
-                    Foreground = SeparatorBrush,
+                    Foreground = GetBrush("AppMutedTextBrush"),
                     VerticalAlignment = VerticalAlignment.Center,
                     FontSize = 11
                 });
@@ -73,21 +68,26 @@ public sealed partial class HotkeyBadge : UserControl
 
             var keyBorder = new Border
             {
-                Background = BadgeBackgroundBrush,
-                BorderBrush = BadgeBorderBrush,
+                Background = GetBrush("AppSurfaceRaisedBrush"),
+                BorderBrush = GetBrush("AppStrokeBrush"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(9999),
-                Padding = new Thickness(8, 2, 8, 2),
+                Padding = new Thickness(8, 3, 8, 3),
                 Child = new TextBlock
                 {
                     Text = segments[i],
                     FontSize = 11,
                     FontFamily = new FontFamily("Cascadia Mono"),
-                    Foreground = BadgeTextBrush
+                    Foreground = GetBrush("AppTextBrush")
                 }
             };
 
             KeysPanel.Children.Add(keyBorder);
         }
+    }
+
+    private static Brush GetBrush(string key)
+    {
+        return (Brush)Application.Current.Resources[key];
     }
 }

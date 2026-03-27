@@ -22,8 +22,8 @@ public sealed class StudioProcessingService : IStudioProcessingService
         }
 
         var firstFrame = session.Frames[0];
-        var zoomKeyframes = _zoomGenerator.Generate(session.CursorEvents, firstFrame.Width, firstFrame.Height);
         var smoothedCursor = _cursorSmoother.Smooth(session.CursorEvents);
+        var zoomKeyframes = _zoomGenerator.Generate(smoothedCursor, firstFrame.Width, firstFrame.Height);
 
         var processedFrames = await _videoCompositor
             .ProcessAsync(
@@ -42,4 +42,3 @@ public sealed class StudioProcessingService : IStudioProcessingService
             smoothedCursor);
     }
 }
-

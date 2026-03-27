@@ -6,214 +6,357 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:WinStudio.App.Controls"
     mc:Ignorable="d">
+    <Page.Resources>
+        <!-- Minimal RadioButton style for colour-swatch pickers. Shows only the
+             coloured circle; a white ring appears when the button is checked. -->
+        <Style x:Key="ColorSwatchStyle" TargetType="RadioButton">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border
+                            x:Name="SwatchBorder"
+                            Width="34"
+                            Height="34"
+                            CornerRadius="17"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="2.5"
+                            BorderBrush="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CheckStates">
+                                    <VisualState x:Name="Checked">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames
+                                                Storyboard.TargetName="SwatchBorder"
+                                                Storyboard.TargetProperty="BorderBrush">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <SolidColorBrush Color="White" />
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unchecked" />
+                                    <VisualState x:Name="Indeterminate" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Background="#FF0D0D0D">
-            <StackPanel Margin="24,16,24,24" Spacing="12">
-                <TextBlock Text="CAPTURE" FontFamily="Segoe UI Variable" FontSize="11" Foreground="#FF555555" CharacterSpacing="80" />
-                <Border Background="#FF161616" BorderBrush="#FF2A2A2A" BorderThickness="1" CornerRadius="8" Padding="12">
+        <Grid Background="{ThemeResource AppPageBackgroundBrush}">
+            <StackPanel Margin="24" Spacing="16">
+                <Border Style="{StaticResource HeroSurfaceStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="RECORD" Style="{StaticResource SectionEyebrowTextStyle}" />
+                        <TextBlock Text="Start a recording" Style="{StaticResource PageTitleTextStyle}" />
+                        <TextBlock
+                            Text="Follow the steps from top to bottom. Choose what to record, adjust tracking if needed, then start."
+                            Style="{StaticResource SectionBodyTextStyle}" />
+                        <TextBlock
+                            x:Name="StatusTextBlock"
+                            Style="{StaticResource CaptionLabelTextStyle}"
+                            MinHeight="18"
+                            Text="Ready." />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SectionSurfaceStyle}">
                     <StackPanel Spacing="12">
+                        <TextBlock Text="1. Choose what to record" Style="{StaticResource SectionTitleTextStyle}" />
+
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
+
                             <ToggleButton
                                 x:Name="WindowCaptureToggle"
                                 Grid.Column="0"
-                                Height="40"
+                                Height="44"
                                 Checked="WindowCaptureToggle_Checked"
-                                Background="#FF0078D4"
-                                Foreground="White"
-                                BorderBrush="#FF0078D4"
-                                BorderThickness="1"
-                                CornerRadius="4">
-                                <TextBlock Text="Window" FontFamily="Segoe UI Variable" FontWeight="SemiBold" />
-                            </ToggleButton>
+                                CornerRadius="4"
+                                Content="Window" />
+
                             <ToggleButton
                                 x:Name="MonitorCaptureToggle"
                                 Grid.Column="1"
-                                Height="40"
+                                Height="44"
                                 Checked="MonitorCaptureToggle_Checked"
-                                Background="#FF1F1F1F"
-                                Foreground="#FF888888"
-                                BorderBrush="#FF2A2A2A"
-                                BorderThickness="1"
-                                CornerRadius="4">
-                                <TextBlock Text="Monitor" FontFamily="Segoe UI Variable" FontWeight="SemiBold" />
-                            </ToggleButton>
+                                CornerRadius="4"
+                                Content="Monitor" />
                         </Grid>
 
                         <Border
                             x:Name="WindowPickerCard"
-                            Background="#FF111111"
-                            BorderBrush="#FF262626"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            Padding="12">
+                            Style="{StaticResource InsetSurfaceStyle}">
                             <StackPanel Spacing="10">
-                                <Grid ColumnSpacing="12">
+                                <Grid ColumnSpacing="10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
+
                                     <StackPanel Spacing="2">
-                                        <TextBlock Text="Target window" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
-                                        <TextBlock Text="Choose the app window to record before you press Start." FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF8A8A8A" TextWrapping="Wrap" />
+                                        <TextBlock
+                                            Text="Pick the window"
+                                            FontFamily="Segoe UI Variable"
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource AppTextBrush}" />
+                                        <TextBlock
+                                            Text="Required for window recording."
+                                            Style="{StaticResource CaptionLabelTextStyle}" />
                                     </StackPanel>
+
                                     <Button
                                         x:Name="RefreshWindowsButton"
                                         Grid.Column="1"
-                                        Height="32"
-                                        Padding="12,0"
-                                        CornerRadius="6"
-                                        Background="#FF1F1F1F"
-                                        Foreground="#FFF2F2F2"
-                                        BorderBrush="#FF2A2A2A"
-                                        BorderThickness="1"
+                                        Style="{StaticResource SecondaryActionButtonStyle}"
                                         Click="RefreshWindowsButton_Click"
                                         Content="Refresh" />
                                 </Grid>
 
                                 <ComboBox
                                     x:Name="WindowPickerComboBox"
-                                    MinWidth="240"
                                     PlaceholderText="Select a window"
                                     SelectionChanged="WindowPickerComboBox_SelectionChanged" />
 
                                 <TextBlock
                                     x:Name="WindowSelectionHintTextBlock"
-                                    FontFamily="Segoe UI Variable"
-                                    FontSize="12"
-                                    Foreground="#FF7F7F7F"
-                                    TextWrapping="Wrap"
+                                    Style="{StaticResource CaptionLabelTextStyle}"
                                     Text="No window selected." />
                             </StackPanel>
                         </Border>
+
+                        <TextBlock
+                            x:Name="CaptureSummaryTextBlock"
+                            Style="{StaticResource CaptionLabelTextStyle}" />
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="AUDIO" FontFamily="Segoe UI Variable" FontSize="11" Foreground="#FF555555" CharacterSpacing="80" Margin="0,4,0,0" />
-                <Border Background="#FF161616" BorderBrush="#FF2A2A2A" BorderThickness="1" CornerRadius="8" Padding="12">
-                    <StackPanel Spacing="8">
-                        <Border Background="#FF111111" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="6" Padding="12">
-                            <Grid ColumnSpacing="12" MinHeight="48">
+                <Border Style="{StaticResource SectionSurfaceStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="2. Optional recording settings" Style="{StaticResource SectionTitleTextStyle}" />
+
+                        <Border Style="{StaticResource InsetSurfaceStyle}">
+                            <Grid ColumnSpacing="12" MinHeight="44">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="System audio" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
-                                    <TextBlock Text="Capture desktop sound with the recording." FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF8A8A8A" TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Text="System audio"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AppTextBrush}" />
+                                    <TextBlock
+                                        Text="Capture desktop sound."
+                                        Style="{StaticResource CaptionLabelTextStyle}" />
                                 </StackPanel>
                                 <ToggleSwitch
                                     x:Name="SystemAudioToggle"
                                     Grid.Column="1"
                                     IsOn="True"
+                                    Toggled="SystemAudioToggle_Toggled"
                                     VerticalAlignment="Center" />
                             </Grid>
                         </Border>
 
-                        <Border Background="#FF111111" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="6" Padding="12" Opacity="0.45">
-                            <Grid ColumnSpacing="12" MinHeight="48">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Microphone" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
-                                    <TextBlock Text="Coming later. Not part of the current recording flow." FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF8A8A8A" TextWrapping="Wrap" />
+                        <Border Style="{StaticResource InsetSurfaceStyle}">
+                            <StackPanel Spacing="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Text="Zoom intensity"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AppTextBrush}" />
+                                    <TextBlock
+                                        x:Name="ZoomIntensityPreviewTextBlock"
+                                        Grid.Column="1"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource AppSubtleTextBrush}" />
+                                </Grid>
+                                <Slider
+                                    x:Name="ZoomIntensitySlider"
+                                    Minimum="0.6"
+                                    Maximum="2.2"
+                                    StepFrequency="0.1"
+                                    ValueChanged="SettingsSlider_ValueChanged" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource InsetSurfaceStyle}">
+                            <StackPanel Spacing="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Text="Zoom sensitivity"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AppTextBrush}" />
+                                    <TextBlock
+                                        x:Name="ZoomSensitivityPreviewTextBlock"
+                                        Grid.Column="1"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource AppSubtleTextBrush}" />
+                                </Grid>
+                                <Slider
+                                    x:Name="ZoomSensitivitySlider"
+                                    Minimum="0.6"
+                                    Maximum="2.0"
+                                    StepFrequency="0.1"
+                                    ValueChanged="SettingsSlider_ValueChanged" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource InsetSurfaceStyle}">
+                            <StackPanel Spacing="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Text="Follow speed"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AppTextBrush}" />
+                                    <TextBlock
+                                        x:Name="FollowSpeedPreviewTextBlock"
+                                        Grid.Column="1"
+                                        FontFamily="Segoe UI Variable"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource AppSubtleTextBrush}" />
+                                </Grid>
+                                <Slider
+                                    x:Name="FollowSpeedSlider"
+                                    Minimum="0.6"
+                                    Maximum="2.0"
+                                    StepFrequency="0.1"
+                                    ValueChanged="SettingsSlider_ValueChanged" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock
+                            x:Name="AudioSummaryTextBlock"
+                            Style="{StaticResource CaptionLabelTextStyle}" />
+                        <TextBlock
+                            x:Name="AutoZoomSummaryTextBlock"
+                            Style="{StaticResource CaptionLabelTextStyle}" />
+
+                        <!-- Background backdrop ──────────────────────────── -->
+                        <Border Style="{StaticResource InsetSurfaceStyle}">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnSpacing="12" MinHeight="44">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock
+                                            Text="Background"
+                                            FontFamily="Segoe UI Variable"
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource AppTextBrush}" />
+                                        <TextBlock
+                                            Text="Place the window on a coloured backdrop."
+                                            Style="{StaticResource CaptionLabelTextStyle}" />
+                                    </StackPanel>
+                                    <ToggleSwitch
+                                        x:Name="BackgroundToggle"
+                                        Grid.Column="1"
+                                        IsOn="True"
+                                        VerticalAlignment="Center"
+                                        Toggled="BackgroundToggle_Toggled" />
+                                </Grid>
+
+                                <!-- Options (hidden when toggle is off) -->
+                                <StackPanel
+                                    x:Name="BackgroundOptionsPanel"
+                                    Visibility="Visible"
+                                    Spacing="10">
+                                    <TextBlock
+                                        Text="Colour"
+                                        Style="{StaticResource CaptionLabelTextStyle}" />
+                                    <ScrollViewer
+                                        HorizontalScrollBarVisibility="Auto"
+                                        VerticalScrollBarVisibility="Disabled">
+                                        <StackPanel
+                                            x:Name="BackgroundSwatchContainer"
+                                            Orientation="Horizontal"
+                                            Spacing="8" />
+                                    </ScrollViewer>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            x:Name="BackgroundImagePathTextBlock"
+                                            Style="{StaticResource CaptionLabelTextStyle}"
+                                            Text="Or pick a custom image file."
+                                            VerticalAlignment="Center"
+                                            TextTrimming="CharacterEllipsis" />
+                                        <Button
+                                            x:Name="BackgroundBrowseButton"
+                                            Grid.Column="1"
+                                            Style="{StaticResource SecondaryActionButtonStyle}"
+                                            Content="Browse"
+                                            Click="BackgroundBrowseButton_Click" />
+                                    </Grid>
                                 </StackPanel>
-                                <ToggleSwitch
-                                    Grid.Column="1"
-                                    IsEnabled="False"
-                                    VerticalAlignment="Center" />
-                            </Grid>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="AUTO ZOOM" FontFamily="Segoe UI Variable" FontSize="11" Foreground="#FF555555" CharacterSpacing="80" Margin="0,4,0,0" />
-                <Border Background="#FF161616" BorderBrush="#FF2A2A2A" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Border Style="{StaticResource SectionSurfaceStyle}">
                     <StackPanel Spacing="12">
-                        <Border Background="#FF111111" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="6" Padding="12">
-                            <StackPanel Spacing="8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Zoom intensity" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
-                                    <TextBlock x:Name="ZoomIntensityPreviewTextBlock" Grid.Column="1" FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF7EC8FF" />
-                                </Grid>
-                                <TextBlock Text="How dramatic the crop feels around movement and clicks." FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF8A8A8A" TextWrapping="Wrap" />
-                                <Slider x:Name="ZoomIntensitySlider" Minimum="0.6" Maximum="2.2" StepFrequency="0.1" ValueChanged="SettingsSlider_ValueChanged" />
-                            </StackPanel>
-                        </Border>
+                        <TextBlock Text="3. Start" Style="{StaticResource SectionTitleTextStyle}" />
+                        <TextBlock
+                            x:Name="ReadinessTextBlock"
+                            Style="{StaticResource SectionBodyTextStyle}" />
+                        <Button
+                            x:Name="StartRecordingButton"
+                            Style="{StaticResource PrimaryActionButtonStyle}"
+                            Click="StartRecordingButton_Click"
+                            Content="Start recording" />
+                        <TextBlock
+                            x:Name="StartRecordingSecondaryTextBlock"
+                            Style="{StaticResource CaptionLabelTextStyle}" />
 
-                        <Border Background="#FF111111" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="6" Padding="12">
+                        <Border Style="{StaticResource InsetSurfaceStyle}">
                             <StackPanel Spacing="8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Zoom sensitivity" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
-                                    <TextBlock x:Name="ZoomSensitivityPreviewTextBlock" Grid.Column="1" FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF7EC8FF" />
-                                </Grid>
-                                <TextBlock Text="How quickly cursor movement triggers camera motion." FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF8A8A8A" TextWrapping="Wrap" />
-                                <Slider x:Name="ZoomSensitivitySlider" Minimum="0.6" Maximum="2.0" StepFrequency="0.1" ValueChanged="SettingsSlider_ValueChanged" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Background="#FF111111" BorderBrush="#FF262626" BorderThickness="1" CornerRadius="6" Padding="12">
-                            <StackPanel Spacing="8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Follow speed" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" Foreground="#FFF2F2F2" />
-                                    <TextBlock x:Name="FollowSpeedPreviewTextBlock" Grid.Column="1" FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF7EC8FF" />
-                                </Grid>
-                                <TextBlock Text="How quickly the camera updates while the cursor moves." FontFamily="Segoe UI Variable" FontSize="12" Foreground="#FF8A8A8A" TextWrapping="Wrap" />
-                                <Slider x:Name="FollowSpeedSlider" Minimum="0.6" Maximum="2.0" StepFrequency="0.1" ValueChanged="SettingsSlider_ValueChanged" />
+                                <TextBlock Text="Shortcuts" Style="{StaticResource SectionTitleTextStyle}" />
+                                <controls:HotkeyBadge Label="Start / Stop" HotkeyText="Ctrl + Shift + R" />
+                                <controls:HotkeyBadge Label="Pause" HotkeyText="Ctrl + Shift + P" />
+                                <controls:HotkeyBadge Label="Cancel" HotkeyText="Esc" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
                 </Border>
-
-                <TextBlock Text="HOTKEYS" FontFamily="Segoe UI Variable" FontSize="11" Foreground="#FF555555" CharacterSpacing="80" Margin="0,4,0,0" />
-                <Border Background="#FF161616" BorderBrush="#FF2A2A2A" BorderThickness="1" CornerRadius="8" Padding="12">
-                    <StackPanel Spacing="8">
-                        <controls:HotkeyBadge Label="Start / Stop" HotkeyText="Ctrl + Shift + R" />
-                        <controls:HotkeyBadge Label="Pause" HotkeyText="Ctrl + Shift + P" />
-                        <controls:HotkeyBadge Label="Cancel" HotkeyText="Esc" />
-                    </StackPanel>
-                </Border>
-
-                <Button
-                    x:Name="StartRecordingButton"
-                    Height="48"
-                    CornerRadius="8"
-                    Background="#FF0078D4"
-                    Foreground="White"
-                    BorderBrush="#FF0078D4"
-                    BorderThickness="1"
-                    Click="StartRecordingButton_Click"
-                    Margin="0,8,0,0">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Ellipse Width="12" Height="12" Fill="White" VerticalAlignment="Center" />
-                        <TextBlock Text="Start Recording" Foreground="White" FontFamily="Segoe UI Variable" FontSize="14" FontWeight="SemiBold" />
-                    </StackPanel>
-                </Button>
-
-                <TextBlock
-                    x:Name="StatusTextBlock"
-                    FontFamily="Segoe UI Variable"
-                    FontSize="12"
-                    Foreground="#FF888888"
-                    TextWrapping="Wrap"
-                    MinHeight="36" />
             </StackPanel>
         </Grid>
     </ScrollViewer>

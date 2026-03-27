@@ -6,58 +6,63 @@ public sealed class CursorSmoother
 {
     public IReadOnlyList<CursorEvent> Smooth(IReadOnlyList<CursorEvent> events, int framesPerSecond = 60)
     {
-        if (events.Count < 5)
+        if (events.Count < 3)
         {
             return events;
         }
 
         var frameTicks = TimeSpan.TicksPerSecond / Math.Max(1, framesPerSecond);
         var protectedTicks = frameTicks * 2;
-
         var clickTimes = events
             .Where(static e => e.EventType is CursorEventType.LeftDown or CursorEventType.LeftUp or CursorEventType.RightDown or CursorEventType.RightUp or CursorEventType.KeyPress)
             .Select(static e => e.TimestampTicks)
             .ToArray();
 
-        // Extract indices of only Move events to use as control points
-        var moveIndices = new List<int>(events.Count);
-        for (var i = 0; i < events.Count; i++)
-        {
-            if (events[i].EventType == CursorEventType.Move)
-            {
-                moveIndices.Add(i);
-            }
-        }
-
         var output = new CursorEvent[events.Count];
+        var hasSmoothedPoint = false;
+        var smoothedX = 0f;
+        var smoothedY = 0f;
+        var lastMoveTicks = 0L;
 
         for (var i = 0; i < events.Count; i++)
         {
             var current = events[i];
-
             if (current.EventType != CursorEventType.Move || IsNearClick(current.TimestampTicks, clickTimes, protectedTicks))
             {
                 output[i] = current;
+                if (current.EventType != CursorEventType.Move)
+                {
+                    hasSmoothedPoint = false;
+                }
+
                 continue;
             }
 
-            var mIndex = moveIndices.BinarySearch(i);
-            if (mIndex < 2 || mIndex > moveIndices.Count - 3)
+            if (!hasSmoothedPoint)
             {
+                smoothedX = current.X;
+                smoothedY = current.Y;
+                lastMoveTicks = current.TimestampTicks;
+                hasSmoothedPoint = true;
                 output[i] = current;
                 continue;
             }
 
-            var p0 = events[moveIndices[mIndex - 2]];
-            var p1 = events[moveIndices[mIndex - 1]];
-            var p2 = events[moveIndices[mIndex + 1]];
-            var p3 = events[moveIndices[mIndex + 2]];
-            var smoothed = CatmullRom(p0, p1, p2, p3, 0.5f);
+            var deltaSeconds = Math.Max(
+                0.0001f,
+                (current.TimestampTicks - lastMoveTicks) / (float)TimeSpan.TicksPerSecond);
+            var distance = MathF.Sqrt(MathF.Pow(current.X - smoothedX, 2f) + MathF.Pow(current.Y - smoothedY, 2f));
+            var speedPixelsPerSecond = distance / deltaSeconds;
+            var smoothingWindowSeconds = Lerp(0.05f, 0.012f, Math.Clamp(speedPixelsPerSecond / 900f, 0f, 1f));
+            var alpha = 1f - MathF.Exp(-deltaSeconds / smoothingWindowSeconds);
 
+            smoothedX = Lerp(smoothedX, current.X, alpha);
+            smoothedY = Lerp(smoothedY, current.Y, alpha);
+            lastMoveTicks = current.TimestampTicks;
             output[i] = current with
             {
-                X = smoothed.X,
-                Y = smoothed.Y
+                X = smoothedX,
+                Y = smoothedY
             };
         }
 
@@ -77,17 +82,8 @@ public sealed class CursorSmoother
         return false;
     }
 
-    private static (float X, float Y) CatmullRom(CursorEvent p0, CursorEvent p1, CursorEvent p2, CursorEvent p3, float t)
+    private static float Lerp(float from, float to, float t)
     {
-        static float Calculate(float tValue, float a, float b, float c, float d)
-        {
-            var t2 = tValue * tValue;
-            var t3 = t2 * tValue;
-            return 0.5f * ((2f * b) + (-a + c) * tValue + ((2f * a) - (5f * b) + (4f * c) - d) * t2 + (-a + (3f * b) - (3f * c) + d) * t3);
-        }
-
-        return (
-            Calculate(t, p0.X, p1.X, p2.X, p3.X),
-            Calculate(t, p0.Y, p1.Y, p2.Y, p3.Y));
+        return from + ((to - from) * Math.Clamp(t, 0f, 1f));
     }
 }

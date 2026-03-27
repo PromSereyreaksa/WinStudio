@@ -4,21 +4,19 @@ namespace WinStudio.Processing;
 
 public sealed class ZoomRegionGenerator
 {
-    private static readonly long BaseHoldTicks = TimeSpan.FromMilliseconds(1600).Ticks;
-    private static readonly long BaseZoomInTicks = TimeSpan.FromMilliseconds(320).Ticks;
-    private static readonly long BaseZoomOutTicks = TimeSpan.FromMilliseconds(480).Ticks;
-    private static readonly long FocusPersistenceTicks = TimeSpan.FromMilliseconds(2200).Ticks;
-    private static readonly long ActivityIdleTimeoutTicks = TimeSpan.FromSeconds(3).Ticks;
-    private static readonly long ClickBurstMergeTicks = TimeSpan.FromMilliseconds(80).Ticks;
-    private static readonly long HoldFollowMinStepTicks = TimeSpan.FromMilliseconds(70).Ticks;
-    private static readonly long TypingStickTicks = TimeSpan.FromMilliseconds(900).Ticks;
-    private const int TransitionSamples = 6;
-    private const float ClickBurstMergeDistance = 20f;
-    private const float HoldFollowDistanceThreshold = 18f;
-    private const float DragFollowDistanceThreshold = 3f;
-    private const float MaxEdgeZoomScale = 8f;
-    private const float EdgeZoomPadding = 4f;
-    private const float MinTargetWidthRatio = 0.14f;
+    // ── Timing ──────────────────────────────────────────────────────────────
+    private static readonly long IdleTimeoutTicks    = TimeSpan.FromSeconds(2.0).Ticks;
+    private static readonly long ZoomInTicks         = TimeSpan.FromMilliseconds(300).Ticks;
+    private static readonly long ZoomOutTicks        = TimeSpan.FromMilliseconds(500).Ticks;
+    private static readonly long PanKeyframeGapTicks = TimeSpan.FromMilliseconds(16).Ticks; // ~60 fps
+
+    // ── Size ─────────────────────────────────────────────────────────────────
+    private const float MinTargetWidthRatio   = 0.25f;  // never zoom more than 4×
+    private const float PanThresholdFraction  = 0.0015f; // 0.15 % of capture width
+    // Intensity multiplier: lower = less aggressive zoom = wider view (less right-side crop).
+    // 0.55 gives ~1.77× at default intensity 1.4 (window ≈ 56 % of screen width),
+    // matching the effective zoom the previous code produced in its steady-state.
+    private const float ZoomScaleMultiplier   = 0.55f;
 
     public IReadOnlyList<ZoomKeyframe> Generate(
         IReadOnlyList<CursorEvent> events,
@@ -29,516 +27,194 @@ public sealed class ZoomRegionGenerator
         float followSpeed = 1.15f)
     {
         if (captureWidth <= 0 || captureHeight <= 0)
-        {
             throw new ArgumentOutOfRangeException(nameof(captureWidth), "Capture dimensions must be positive.");
-        }
 
         if (events.Count == 0)
-        {
             return [];
-        }
 
-        var ordered = events.OrderBy(static e => e.TimestampTicks).ToArray();
-        var clickEvents = ordered
-            .Where(static e => e.EventType == CursorEventType.LeftDown)
-            .OrderBy(static e => e.TimestampTicks)
-            .ToArray();
-        if (clickEvents.Length == 0)
-        {
-            return [];
-        }
-        clickEvents = MergeClickBursts(clickEvents);
-
-        var allOrderedEvents = ordered;
-
+        var ordered       = events.OrderBy(static e => e.TimestampTicks).ToArray();
         var safeIntensity = Math.Clamp(zoomIntensity, 0.6f, 2.2f);
-        var safeSensitivity = Math.Clamp(zoomSensitivity, 0.6f, 2.0f);
-        var safeSpeed = Math.Clamp(followSpeed, 0.6f, 2.0f);
-        var zoomScale = Math.Clamp(1.12f + (safeIntensity * 0.52f), 1.18f, 2.25f);
-        var zoomInTicks = (long)Math.Clamp(BaseZoomInTicks / safeSpeed, TimeSpan.FromMilliseconds(200).Ticks, TimeSpan.FromMilliseconds(420).Ticks);
-        var zoomOutTicks = (long)Math.Clamp(BaseZoomOutTicks / safeSpeed, TimeSpan.FromMilliseconds(300).Ticks, TimeSpan.FromMilliseconds(680).Ticks);
-        var baseHoldTicks = (long)Math.Clamp(BaseHoldTicks * safeSensitivity, TimeSpan.FromMilliseconds(900).Ticks, TimeSpan.FromMilliseconds(2600).Ticks);
-        var followMinStepTicks = (long)Math.Clamp(HoldFollowMinStepTicks / safeSpeed, TimeSpan.FromMilliseconds(40).Ticks, TimeSpan.FromMilliseconds(90).Ticks);
-        var passiveFollowThreshold = Math.Clamp(HoldFollowDistanceThreshold - ((safeSpeed - 1f) * 4f), 10f, 18f);
+        var zoomScale     = Math.Clamp(1.0f + safeIntensity * ZoomScaleMultiplier, 1.1f, 2.5f);
+        var thresholdX    = Math.Max(2f, captureWidth  * PanThresholdFraction);
+        var thresholdY    = Math.Max(2f, captureHeight * PanThresholdFraction);
+        var fullScreen    = new RectF(0f, 0f, captureWidth, captureHeight);
 
-        var fullFrame = new RectF(0f, 0f, captureWidth, captureHeight);
-        var timeline = new List<ZoomKeyframe>();
-        var currentRect = fullFrame;
+        var timeline         = new List<ZoomKeyframe>(256);
+        var isZoomed         = false;
+        var cameraRect       = fullScreen;         // current EMITTED camera window
+        var timelineTick     = ordered[0].TimestampTicks;
+        var lastActivityTick = ordered[0].TimestampTicks;
+        var lastPanTick      = ordered[0].TimestampTicks;
+        // Latest cursor position seen — updated on every Move.  Used so that if
+        // the cursor moves during the zoom-in animation (when gap never passes),
+        // the subsequent Hold still lands at the correct camera position.
+        var lastCursorX      = ordered[0].X;
+        var lastCursorY      = ordered[0].Y;
 
-        for (var i = 0; i < clickEvents.Length; i++)
+        // Emit a static hold segment from timelineTick → endTick.
+        void Hold(long endTick)
         {
-            var clickEvent = clickEvents[i];
-            var nextClickTicks = i < clickEvents.Length - 1
-                ? clickEvents[i + 1].TimestampTicks
-                : long.MaxValue;
-            var targetRect = BuildTargetRect(clickEvent.X, clickEvent.Y, captureWidth, captureHeight, zoomScale);
-            var needsTransition = !RectsClose(currentRect, targetRect);
-            var holdStartTicks = clickEvent.TimestampTicks;
-            var zoomInEndTicks = clickEvent.TimestampTicks + zoomInTicks;
-            var holdEndTicks = zoomInEndTicks + ComputeActivityExtendedHoldTicks(clickEvent, allOrderedEvents, targetRect, baseHoldTicks);
+            if (endTick > timelineTick)
+                timeline.Add(new ZoomKeyframe
+                {
+                    StartTicks = timelineTick, EndTicks = endTick,
+                    TargetRect = cameraRect,
+                    EasingIn = EasingType.Linear, EasingOut = EasingType.Linear,
+                    IsAutoGenerated = true
+                });
+            timelineTick = endTick;
+        }
 
-            if (nextClickTicks < zoomInEndTicks)
+        // Emit an animated transition and advance the write cursor.
+        void Transition(long start, long end, RectF target, EasingType easing)
+        {
+            if (end > start)
+                timeline.Add(new ZoomKeyframe
+                {
+                    StartTicks = start, EndTicks = end,
+                    TargetRect = target,
+                    EasingIn = easing, EasingOut = easing,
+                    IsAutoGenerated = true
+                });
+            timelineTick = end;
+        }
+
+        // Camera window centered on cursor, same size, clamped inside capture.
+        RectF FollowCursor(float x, float y) =>
+            new RectF(x - cameraRect.Width / 2f, y - cameraRect.Height / 2f,
+                      cameraRect.Width, cameraRect.Height)
+                .ClampWithin(captureWidth, captureHeight);
+
+        // Apply the latest known cursor position to cameraRect before a Hold/ZoomOut.
+        // This handles the case where the cursor moved during the zoom-in window but
+        // the pan gap never fired, so cameraRect was never updated in the loop.
+        void FlushCursorToCamera()
+        {
+            var desired = FollowCursor(lastCursorX, lastCursorY);
+            var dx = MathF.Abs(desired.X - cameraRect.X);
+            var dy = MathF.Abs(desired.Y - cameraRect.Y);
+            if (dx > thresholdX || dy > thresholdY)
+                cameraRect = desired;
+        }
+
+        // Close any open hold, animate to full-screen, update state.
+        void ZoomOut(long fromTick)
+        {
+            FlushCursorToCamera();   // apply any buffered cursor movement first
+            Hold(fromTick);
+            Transition(fromTick, fromTick + ZoomOutTicks, fullScreen, EasingType.EaseInOutCubic);
+            cameraRect = fullScreen;
+            isZoomed   = false;
+        }
+
+        foreach (var evt in ordered)
+        {
+            var tick      = evt.TimestampTicks;
+            var eventType = evt.EventType;
+            var isClick   = IsActivationEvent(eventType);
+            var isMove    = eventType == CursorEventType.Move;
+            var isKey     = eventType == CursorEventType.KeyPress;
+
+            // ── Idle-timeout check ────────────────────────────────────────────
+            // Must happen before handling the current event so keyframe times stay
+            // monotone: zoom-out is anchored to lastActivityTick + timeout, NOT tick.
+            if (isZoomed && tick > lastActivityTick + IdleTimeoutTicks)
+                ZoomOut(lastActivityTick + IdleTimeoutTicks);
+
+            // ── Not zoomed + activation → zoom in centered on cursor ──────────
+            if (!isZoomed && isClick && evt.X >= 0f && evt.Y >= 0f)
             {
-                zoomInEndTicks = nextClickTicks;
-            }
-
-            if (needsTransition)
-            {
-                AppendTransition(
-                    timeline,
-                    currentRect,
-                    targetRect,
-                    clickEvent.TimestampTicks,
-                    zoomInEndTicks,
-                    captureWidth,
-                    captureHeight);
-
-                holdStartTicks = zoomInEndTicks;
-            }
-
-            currentRect = targetRect;
-
-            if (nextClickTicks < holdEndTicks)
-            {
-                holdEndTicks = nextClickTicks;
-            }
-
-            currentRect = AppendDynamicHoldSegments(
-                timeline,
-                allOrderedEvents,
-                holdStartTicks,
-                holdEndTicks,
-                targetRect,
-                captureWidth,
-                captureHeight,
-                followMinStepTicks,
-                passiveFollowThreshold);
-
-            if (nextClickTicks == long.MaxValue)
-            {
-                AppendTransition(
-                    timeline,
-                    currentRect,
-                    fullFrame,
-                    holdEndTicks,
-                    holdEndTicks + zoomOutTicks,
-                    captureWidth,
-                    captureHeight);
-                break;
-            }
-
-            var idleGapTicks = nextClickTicks - holdEndTicks;
-            if (idleGapTicks <= FocusPersistenceTicks)
-            {
-                AppendSegment(
-                    timeline,
-                    holdEndTicks,
-                    nextClickTicks,
-                    currentRect,
-                    EasingType.EaseInOutCubic,
-                    EasingType.EaseOutCubic);
+                var target = BuildZoomRegion(evt.X, evt.Y, zoomScale, captureWidth, captureHeight);
+                Hold(tick);
+                Transition(tick, tick + ZoomInTicks, target, EasingType.EaseOutCubic);
+                cameraRect       = target;
+                isZoomed         = true;
+                lastActivityTick = tick;
+                lastPanTick      = timelineTick;
                 continue;
             }
 
-            var zoomOutEndTicks = holdEndTicks + zoomOutTicks;
-            if (zoomOutEndTicks <= nextClickTicks)
+            // ── Zoomed + move → pan camera to follow cursor ───────────────────
+            if (isZoomed && isMove)
             {
-                AppendTransition(
-                    timeline,
-                    currentRect,
-                    fullFrame,
-                    holdEndTicks,
-                    zoomOutEndTicks,
-                    captureWidth,
-                    captureHeight);
-                currentRect = fullFrame;
-            }
-        }
+                lastActivityTick = tick;
+                lastCursorX      = evt.X;
+                lastCursorY      = evt.Y;
 
-        return timeline;
-    }
-
-    private static CursorEvent[] MergeClickBursts(IReadOnlyList<CursorEvent> clickEvents)
-    {
-        if (clickEvents.Count <= 1)
-        {
-            return clickEvents.ToArray();
-        }
-
-        var merged = new List<CursorEvent>(clickEvents.Count) { clickEvents[0] };
-        for (var i = 1; i < clickEvents.Count; i++)
-        {
-            var current = clickEvents[i];
-            var previous = merged[^1];
-            var deltaTicks = current.TimestampTicks - previous.TimestampTicks;
-            if (deltaTicks <= ClickBurstMergeTicks
-                && Distance(previous.X, previous.Y, current.X, current.Y) <= ClickBurstMergeDistance)
-            {
-                merged[^1] = current;
+                // Throttle Hold emissions to ~30 fps.  cameraRect is only updated
+                // when we actually emit, so the threshold check below correctly
+                // measures cumulative distance since the LAST HOLD — not since the
+                // last individual event.  This fixes slow-movement tracking where
+                // the old code updated cameraRect on every event, resetting the
+                // delta to near-zero and causing moved=false perpetually.
+                if (tick - lastPanTick >= PanKeyframeGapTicks)
+                {
+                    var desired = FollowCursor(evt.X, evt.Y);
+                    var dx      = MathF.Abs(desired.X - cameraRect.X);
+                    var dy      = MathF.Abs(desired.Y - cameraRect.Y);
+                    if (dx > thresholdX || dy > thresholdY)
+                    {
+                        Hold(tick);
+                        cameraRect  = desired;
+                    }
+                    // Always advance lastPanTick even when camera didn't move —
+                    // prevents a burst of identical holds after a static period.
+                    lastPanTick = tick;
+                }
                 continue;
             }
 
-            merged.Add(current);
-        }
-
-        return merged.ToArray();
-    }
-
-    private static RectF AppendDynamicHoldSegments(
-        List<ZoomKeyframe> timeline,
-        IReadOnlyList<CursorEvent> allEvents,
-        long startTicks,
-        long endTicks,
-        RectF startRect,
-        int captureWidth,
-        int captureHeight,
-        long followMinStepTicks,
-        float passiveFollowDistanceThreshold)
-    {
-        if (endTicks <= startTicks)
-        {
-            return startRect;
-        }
-
-        var width = startRect.Width;
-        var height = startRect.Height;
-        var centerX = startRect.X + (width / 2f);
-        var centerY = startRect.Y + (height / 2f);
-        var lastAcceptedTicks = startTicks;
-        var isDragging = IsLeftButtonDownAt(allEvents, startTicks);
-        var typingStickyUntilTicks = long.MinValue;
-        var anchors = new List<(long Ticks, float X, float Y)> { (startTicks, centerX, centerY) };
-
-        for (var i = 0; i < allEvents.Count; i++)
-        {
-            var evt = allEvents[i];
-            if (evt.TimestampTicks <= startTicks)
+            // ── Zoomed + activation → reset idle timer, snap to cursor if far ─
+            if (isZoomed && isClick)
             {
+                lastActivityTick = tick;
+                lastCursorX      = evt.X;
+                lastCursorY      = evt.Y;
+                var desired = FollowCursor(evt.X, evt.Y);
+                var dx      = MathF.Abs(desired.X - cameraRect.X);
+                var dy      = MathF.Abs(desired.Y - cameraRect.Y);
+                if (dx > thresholdX || dy > thresholdY)
+                {
+                    Hold(tick);
+                    cameraRect  = desired;
+                    lastPanTick = tick;
+                }
                 continue;
             }
 
-            if (evt.TimestampTicks >= endTicks)
+            // ── Zoomed + key press → keep zoom alive ──────────────────────────
+            if (isZoomed && isKey)
             {
-                break;
-            }
-
-            var targetX = Math.Clamp(evt.X, 0f, captureWidth);
-            var targetY = Math.Clamp(evt.Y, 0f, captureHeight);
-            var distanceToTarget = Distance(centerX, centerY, targetX, targetY);
-
-            switch (evt.EventType)
-            {
-                case CursorEventType.LeftDown:
-                    isDragging = true;
-                    if (evt.TimestampTicks - lastAcceptedTicks < followMinStepTicks || distanceToTarget < DragFollowDistanceThreshold)
-                    {
-                        continue;
-                    }
-
-                    centerX = targetX;
-                    centerY = targetY;
-                    break;
-
-                case CursorEventType.LeftUp:
-                    isDragging = false;
-                    if (evt.TimestampTicks - lastAcceptedTicks < followMinStepTicks || distanceToTarget < DragFollowDistanceThreshold)
-                    {
-                        continue;
-                    }
-
-                    centerX = targetX;
-                    centerY = targetY;
-                    break;
-
-                case CursorEventType.KeyPress:
-                    typingStickyUntilTicks = evt.TimestampTicks + TypingStickTicks;
-                    if (evt.TimestampTicks - lastAcceptedTicks < followMinStepTicks || distanceToTarget < DragFollowDistanceThreshold)
-                    {
-                        continue;
-                    }
-
-                    // Typing is a strong attention signal. Pin directly to the current mouse location.
-                    centerX = targetX;
-                    centerY = targetY;
-                    break;
-
-                case CursorEventType.Scroll:
-                case CursorEventType.RightDown:
-                    if (evt.TimestampTicks - lastAcceptedTicks < followMinStepTicks || distanceToTarget < passiveFollowDistanceThreshold)
-                    {
-                        continue;
-                    }
-
-                    centerX = targetX;
-                    centerY = targetY;
-                    break;
-
-                case CursorEventType.Move:
-                    if (evt.TimestampTicks <= typingStickyUntilTicks)
-                    {
-                        continue;
-                    }
-
-                    if (evt.TimestampTicks - lastAcceptedTicks < followMinStepTicks)
-                    {
-                        continue;
-                    }
-
-                    if (isDragging)
-                    {
-                        if (distanceToTarget < DragFollowDistanceThreshold)
-                        {
-                            continue;
-                        }
-
-                        // During click-drag selection, keep the crop locked to the cursor.
-                        centerX = targetX;
-                        centerY = targetY;
-                    }
-                    else
-                    {
-                        // Plain cursor travel between actions should not pull the camera off the
-                        // clicked focus point. Keep hold duration extended by activity, but do not
-                        // recenter unless the user is actively dragging.
-                        continue;
-                    }
-
-                    break;
-
-                default:
-                    continue;
-            }
-
-            anchors.Add((evt.TimestampTicks, centerX, centerY));
-            lastAcceptedTicks = evt.TimestampTicks;
-        }
-
-        anchors.Add((endTicks, centerX, centerY));
-        for (var i = 0; i < anchors.Count - 1; i++)
-        {
-            var segmentStart = anchors[i].Ticks;
-            var segmentEnd = anchors[i + 1].Ticks;
-            if (segmentEnd <= segmentStart)
-            {
-                continue;
-            }
-
-            var fromRect = RectF.FromCenter(anchors[i].X, anchors[i].Y, width, height).ClampWithin(captureWidth, captureHeight);
-            var toRect = RectF.FromCenter(anchors[i + 1].X, anchors[i + 1].Y, width, height).ClampWithin(captureWidth, captureHeight);
-            // Keep this as a single segment to avoid huge FFmpeg expressions.
-            AppendSegment(
-                timeline,
-                segmentStart,
-                segmentEnd,
-                fromRect,
-                EasingType.EaseInOutCubic,
-                EasingType.EaseOutCubic);
-        }
-
-        var finalAnchor = anchors[^1];
-        return RectF.FromCenter(finalAnchor.X, finalAnchor.Y, width, height).ClampWithin(captureWidth, captureHeight);
-    }
-
-    private static bool IsLeftButtonDownAt(IReadOnlyList<CursorEvent> allEvents, long ticks)
-    {
-        var isDown = false;
-        for (var i = 0; i < allEvents.Count; i++)
-        {
-            var evt = allEvents[i];
-            if (evt.TimestampTicks > ticks)
-            {
-                break;
-            }
-
-            if (evt.EventType == CursorEventType.LeftDown)
-            {
-                isDown = true;
-            }
-            else if (evt.EventType == CursorEventType.LeftUp)
-            {
-                isDown = false;
+                lastActivityTick = tick;
             }
         }
 
-        return isDown;
+        // Seal any remaining zoomed state at end of recording.
+        if (isZoomed)
+            ZoomOut(Math.Max(timelineTick, lastActivityTick + IdleTimeoutTicks));
+
+        return timeline.Any(k => k.TargetRect.Width < captureWidth - 1f
+                               || k.TargetRect.Height < captureHeight - 1f)
+            ? timeline
+            : [];
     }
 
-    private static long ComputeActivityExtendedHoldTicks(
-        CursorEvent clickEvent,
-        IReadOnlyList<CursorEvent> allEvents,
-        RectF targetRect,
-        long baseHoldTicks)
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private static bool IsActivationEvent(CursorEventType eventType) =>
+        eventType is CursorEventType.LeftDown or CursorEventType.RightDown or CursorEventType.Scroll;
+
+    private static RectF BuildZoomRegion(
+        float cursorX, float cursorY,
+        float zoomScale,
+        int captureWidth, int captureHeight)
     {
-        _ = targetRect;
-
-        // Start with the click itself as the last known activity.
-        var lastActivityTicks = clickEvent.TimestampTicks;
-        var idleDeadlineTicks = lastActivityTicks + ActivityIdleTimeoutTicks;
-
-        for (var i = 0; i < allEvents.Count; i++)
-        {
-            var evt = allEvents[i];
-
-            // Skip events at or before the click.
-            if (evt.TimestampTicks <= clickEvent.TimestampTicks)
-            {
-                continue;
-            }
-
-            // Once we pass the idle deadline, no more activity can extend it.
-            if (evt.TimestampTicks > idleDeadlineTicks)
-            {
-                break;
-            }
-
-            if (!IsActivityEvent(evt.EventType))
-            {
-                continue;
-            }
-
-            // This event counts as activity, so slide the idle window forward.
-            lastActivityTicks = evt.TimestampTicks;
-            idleDeadlineTicks = lastActivityTicks + ActivityIdleTimeoutTicks;
-        }
-
-        // The hold extends from the click until the idle deadline expires.
-        var totalHoldTicks = idleDeadlineTicks - clickEvent.TimestampTicks;
-        return Math.Max(baseHoldTicks, totalHoldTicks);
-    }
-
-    private static bool IsActivityEvent(CursorEventType eventType)
-    {
-        return eventType is CursorEventType.Move
-            or CursorEventType.LeftDown
-            or CursorEventType.LeftUp
-            or CursorEventType.RightDown
-            or CursorEventType.RightUp
-            or CursorEventType.Scroll
-            or CursorEventType.KeyPress;
-    }
-
-    private static RectF BuildTargetRect(float centerX, float centerY, int captureWidth, int captureHeight, float zoomScale)
-    {
-        if (zoomScale <= 1.03f)
-        {
+        if (zoomScale <= 1.01f)
             return new RectF(0f, 0f, captureWidth, captureHeight);
-        }
 
-        var clampedCenterX = Math.Clamp(centerX, 0f, captureWidth);
-        var clampedCenterY = Math.Clamp(centerY, 0f, captureHeight);
-        var minDistanceX = MathF.Min(clampedCenterX, captureWidth - clampedCenterX);
-        var minDistanceY = MathF.Min(clampedCenterY, captureHeight - clampedCenterY);
-        var requiredScaleX = captureWidth / MathF.Max(2f, (2f * minDistanceX) + EdgeZoomPadding);
-        var requiredScaleY = captureHeight / MathF.Max(2f, (2f * minDistanceY) + EdgeZoomPadding);
-        var edgeAwareScale = Math.Max(zoomScale, Math.Min(MaxEdgeZoomScale, Math.Max(requiredScaleX, requiredScaleY)));
-
-        var width = captureWidth / edgeAwareScale;
-        var minWidth = captureWidth * MinTargetWidthRatio;
-        if (width < minWidth)
-        {
-            width = minWidth;
-        }
-
-        var height = width * captureHeight / captureWidth;
-
-        return RectF.FromCenter(clampedCenterX, clampedCenterY, width, height).ClampWithin(captureWidth, captureHeight);
-    }
-
-    private static void AppendTransition(
-        List<ZoomKeyframe> timeline,
-        RectF fromRect,
-        RectF toRect,
-        long startTicks,
-        long endTicks,
-        int captureWidth,
-        int captureHeight)
-    {
-        if (endTicks <= startTicks)
-        {
-            AppendSegment(timeline, startTicks, endTicks, toRect, EasingType.EaseInOutCubic, EasingType.EaseOutCubic);
-            return;
-        }
-
-        var durationTicks = endTicks - startTicks;
-        for (var i = 0; i < TransitionSamples; i++)
-        {
-            var segmentStart = startTicks + ((durationTicks * i) / TransitionSamples);
-            var segmentEnd = startTicks + ((durationTicks * (i + 1)) / TransitionSamples);
-            var easedProgress = EaseInOutCubic((i + 1f) / TransitionSamples);
-            var rect = LerpRect(fromRect, toRect, easedProgress).ClampWithin(captureWidth, captureHeight);
-            AppendSegment(timeline, segmentStart, segmentEnd, rect, EasingType.EaseInOutCubic, EasingType.EaseOutCubic);
-        }
-    }
-
-    private static void AppendSegment(
-        List<ZoomKeyframe> timeline,
-        long startTicks,
-        long endTicks,
-        RectF rect,
-        EasingType easingIn,
-        EasingType easingOut)
-    {
-        if (endTicks <= startTicks)
-        {
-            return;
-        }
-
-        if (timeline.Count > 0)
-        {
-            var last = timeline[^1];
-            if (last.EndTicks == startTicks && RectsClose(last.TargetRect, rect))
-            {
-                timeline[^1] = last with { EndTicks = endTicks };
-                return;
-            }
-        }
-
-        timeline.Add(
-            new ZoomKeyframe
-            {
-                StartTicks = startTicks,
-                EndTicks = endTicks,
-                TargetRect = rect,
-                EasingIn = easingIn,
-                EasingOut = easingOut,
-                IsAutoGenerated = true
-            });
-    }
-
-    private static RectF LerpRect(RectF from, RectF to, float t)
-    {
-        return new RectF(
-            Lerp(from.X, to.X, t),
-            Lerp(from.Y, to.Y, t),
-            Lerp(from.Width, to.Width, t),
-            Lerp(from.Height, to.Height, t));
-    }
-
-    private static bool RectsClose(RectF a, RectF b)
-    {
-        return Math.Abs(a.X - b.X) <= 1f
-            && Math.Abs(a.Y - b.Y) <= 1f
-            && Math.Abs(a.Width - b.Width) <= 1f
-            && Math.Abs(a.Height - b.Height) <= 1f;
-    }
-
-    private static float EaseInOutCubic(float t)
-    {
-        var clamped = Math.Clamp(t, 0f, 1f);
-        return clamped < 0.5f
-            ? 4f * clamped * clamped * clamped
-            : 1f - (MathF.Pow(-2f * clamped + 2f, 3f) / 2f);
-    }
-
-    private static float Distance(float x1, float y1, float x2, float y2)
-    {
-        var dx = x2 - x1;
-        var dy = y2 - y1;
-        return MathF.Sqrt((dx * dx) + (dy * dy));
-    }
-
-    private static float Lerp(float from, float to, float t)
-    {
-        return from + ((to - from) * Math.Clamp(t, 0f, 1f));
+        var width  = Math.Max(captureWidth  * MinTargetWidthRatio, captureWidth  / zoomScale);
+        var height = Math.Max(captureHeight * MinTargetWidthRatio, captureHeight / zoomScale);
+        return RectF.FromCenter(cursorX, cursorY, width, height)
+            .ClampWithin(captureWidth, captureHeight);
     }
 }

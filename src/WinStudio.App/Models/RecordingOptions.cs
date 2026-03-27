@@ -1,3 +1,5 @@
+using WinStudio.Common;
+
 namespace WinStudio.App.Models;
 
 public sealed record RecordingOptions(
@@ -8,4 +10,5 @@ public sealed record RecordingOptions(
     string? SelectedWindowTitle,
     float ZoomIntensity,
     float ZoomSensitivity,
-    float FollowSpeed);
+    float FollowSpeed,
+    BackgroundSettings Background);

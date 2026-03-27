@@ -7,6 +7,9 @@ public partial class App : Application
 {
     private Window? _window;
 
+    /// <summary>The active application window. Available after <see cref="OnLaunched"/>.</summary>
+    public static Window? ActiveWindow { get; private set; }
+
     public App()
     {
         InitializeComponent();
@@ -16,6 +19,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _window = new MainWindow();
+        ActiveWindow = _window;
         _window.Activate();
     }
 
