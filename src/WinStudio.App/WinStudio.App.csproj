@@ -21,4 +21,10 @@
     <ProjectReference Include="..\WinStudio.Editor\WinStudio.Editor.csproj" />
     <ProjectReference Include="..\WinStudio.Export\WinStudio.Export.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\WinStudio.Assets\wallpapers\*.jpg">
+      <Link>Assets\Wallpapers\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -10,6 +10,8 @@ public static class WindowHelper
 {
     private const int DefaultDpi = 96;
     private const int DwmwaExtendedFrameBounds = 9;
+    private const uint WdaNone = 0x0;
+    private const uint WdaExcludeFromCapture = 0x11;
 
     public static IntPtr GetWindowHandle(Window window)
     {
@@ -44,6 +46,8 @@ public static class WindowHelper
                 presenter.IsMaximizable = false;
                 presenter.IsMinimizable = true;
             }
+
+            TrySetCaptureExclusion(hwnd, excludeFromCapture: false);
         }
         catch
         {
@@ -79,6 +83,7 @@ public static class WindowHelper
             }
 
             PositionFloatingToolbar(appWindow, size.Width, size.Height, margin, avoidWindowHandle);
+            TrySetCaptureExclusion(hwnd, excludeFromCapture: true);
         }
         catch
         {
@@ -185,8 +190,26 @@ public static class WindowHelper
     [DllImport("user32.dll")]
     private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out RECT pvAttribute, int cbAttribute);
+
+    private static void TrySetCaptureExclusion(IntPtr hwnd, bool excludeFromCapture)
+    {
+        try
+        {
+            _ = SetWindowDisplayAffinity(
+                hwnd,
+                excludeFromCapture ? WdaExcludeFromCapture : WdaNone
+            );
+        }
+        catch
+        {
+            // Exclusion is best-effort. Keep recording functional on unsupported systems.
+        }
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT

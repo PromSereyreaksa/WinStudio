@@ -16,3 +16,4 @@ public interface IScreenStudioRecorderService
 
     Task<RecordingResult> StopAsync(CancellationToken cancellationToken);
 }
+

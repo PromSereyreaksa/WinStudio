@@ -18,6 +18,8 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
     private const int SmCyVirtualScreen = 79;
     private const int DwmwaExtendedFrameBounds = 9;
     private const int CaptureMapTolerancePixels = 24;
+    private const double RenderSegmentSmoothingSeconds = 0.10d;
+    private static readonly long RecordingStartupIgnoreTicks = TimeSpan.FromMilliseconds(350).Ticks;
 
     private readonly object _sync = new();
     private readonly List<CursorEvent> _cursorEvents = [];
@@ -61,6 +63,27 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
     // Cached module handle — required for hooks to work reliably on 64-bit .NET.
     // Passing IntPtr.Zero causes silent hook installation failure on many systems.
     private static readonly IntPtr HookModuleHandle = GetModuleHandle(null);
+    private static readonly object RecordingEncoderSync = new();
+    private static RecordingEncoderProfile? _recordingEncoderProfile;
+    private static readonly RecordingEncoderProfile[] RecordingEncoderCandidates =
+    [
+        new(
+            "h264_nvenc",
+            "-c:v h264_nvenc -preset p1 -tune ll -pix_fmt yuv420p"
+        ),
+        new(
+            "h264_qsv",
+            "-c:v h264_qsv -preset veryfast -pix_fmt nv12"
+        ),
+        new(
+            "h264_amf",
+            "-c:v h264_amf -usage ultralowlatency -quality speed -pix_fmt nv12"
+        ),
+        new(
+            "libx264",
+            "-c:v libx264 -preset ultrafast -tune zerolatency -pix_fmt yuv420p"
+        ),
+    ];
 
     public bool IsRecording => _recording;
 
@@ -659,7 +682,8 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
     {
         _ = options;
         var captureInputArguments = BuildDesktopCaptureArguments(bounds);
-        return $"-y -f gdigrab -framerate {framesPerSecond} {captureInputArguments} -an -c:v libx264 -preset ultrafast -pix_fmt yuv420p \"{outputPath}\"";
+        var encoderProfile = GetRecordingEncoderProfile();
+        return $"-y -f gdigrab -framerate {framesPerSecond} {captureInputArguments} -an {encoderProfile.Arguments} \"{outputPath}\"";
     }
 
     private static string BuildDesktopCaptureArguments(CaptureBounds bounds)
@@ -744,6 +768,9 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
                 cancellationToken
             )
             .ConfigureAwait(false);
+        var inputFrameRate = await ProbeVideoFrameRateAsync(inputPath, cancellationToken)
+            .ConfigureAwait(false);
+        var safeFrameRate = string.IsNullOrWhiteSpace(inputFrameRate) ? "60" : inputFrameRate;
         var segments = BuildSegments(
             zoomKeyframes,
             bounds,
@@ -818,7 +845,7 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
             {
                 // [1:v] is the image input — added to the ffmpeg ArgumentList below.
                 bgSourceFilter =
-                    $"[1:v]scale={safeOutWidth}:{safeOutHeight}:force_original_aspect_ratio=increase" +
+                    $"[1:v]fps=fps={safeFrameRate},scale={safeOutWidth}:{safeOutHeight}:force_original_aspect_ratio=increase" +
                     $",crop={safeOutWidth}:{safeOutHeight},setsar=1[bg]";
             }
             else
@@ -826,12 +853,12 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
                 // Solid colour background via lavfi color source.
                 var colorHex = background.ColorHex.TrimStart('#');
                 bgSourceFilter =
-                    $"color=c=0x{colorHex}:size={safeOutWidth}x{safeOutHeight},setsar=1[bg]";
+                    $"color=c=0x{colorHex}:size={safeOutWidth}x{safeOutHeight}:rate={safeFrameRate},setsar=1[bg]";
             }
 
             filterGraph =
                 $"{bgSourceFilter};" +
-                $"color=c=black:size={innerW}x{innerH},setsar=1[winbase];" +
+                $"color=c=black:size={innerW}x{innerH}:rate={safeFrameRate},setsar=1[winbase];" +
                 $"[0:v]scale=w='{scaledWidthBgExpr}':h='{scaledHeightBgExpr}':eval=frame:flags=bicubic[scaledwin];" +
                 $"[winbase][scaledwin]overlay=x='{overlayXBgExpr}':y='{overlayYBgExpr}':eval=frame:shortest=1[win];" +
                 // shortest=1: stop when the finite video input ([win]) ends,
@@ -842,7 +869,7 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
         else
         {
             filterGraph =
-                $"color=c=black:size={safeOutWidth}x{safeOutHeight},setsar=1[base];" +
+                $"color=c=black:size={safeOutWidth}x{safeOutHeight}:rate={safeFrameRate},setsar=1[base];" +
                 $"[0:v]scale=w='{scaledWidthExpr}':h='{scaledHeightExpr}':eval=frame:flags=bicubic[scaled];" +
                 $"[base][scaled]overlay=x='{overlayXExpr}':y='{overlayYExpr}':eval=frame:shortest=1[v]";
         }
@@ -888,6 +915,8 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
         startInfo.ArgumentList.Add("ultrafast");
         startInfo.ArgumentList.Add("-pix_fmt");
         startInfo.ArgumentList.Add("yuv420p");
+        startInfo.ArgumentList.Add("-r");
+        startInfo.ArgumentList.Add(safeFrameRate);
         startInfo.ArgumentList.Add("-movflags");
         startInfo.ArgumentList.Add("+faststart");
         if (useBackground)
@@ -1084,6 +1113,121 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
         return MergeAdjacentSegments(renderSegments);
     }
 
+    private static List<ZoomSegment> SmoothRenderSegments(IReadOnlyList<ZoomSegment> segments)
+    {
+        if (segments.Count < 3)
+        {
+            return MergeAdjacentSegments(segments);
+        }
+
+        var smoothed = new List<ZoomSegment>(segments.Count);
+        for (var i = 0; i < segments.Count;)
+        {
+            if (IsFullFrameSegment(segments[i]))
+            {
+                smoothed.Add(segments[i]);
+                i++;
+                continue;
+            }
+
+            var runStart = i;
+            while (i < segments.Count && !IsFullFrameSegment(segments[i]))
+            {
+                i++;
+            }
+
+            smoothed.AddRange(SmoothZoomRun(segments, runStart, i));
+        }
+
+        return MergeAdjacentSegments(smoothed);
+    }
+
+    private static IEnumerable<ZoomSegment> SmoothZoomRun(
+        IReadOnlyList<ZoomSegment> segments,
+        int startInclusive,
+        int endExclusive
+    )
+    {
+        var count = endExclusive - startInclusive;
+        if (count <= 2)
+        {
+            for (var i = startInclusive; i < endExclusive; i++)
+            {
+                yield return segments[i];
+            }
+
+            yield break;
+        }
+
+        var source = new ZoomSegment[count];
+        for (var i = 0; i < count; i++)
+        {
+            source[i] = segments[startInclusive + i];
+        }
+
+        var xForward = new double[count];
+        var yForward = new double[count];
+        var widthForward = new double[count];
+        var heightForward = new double[count];
+
+        xForward[0] = source[0].X;
+        yForward[0] = source[0].Y;
+        widthForward[0] = source[0].Width;
+        heightForward[0] = source[0].Height;
+
+        for (var i = 1; i < count; i++)
+        {
+            var alpha = ComputeSmoothingAlpha(source[i]);
+            xForward[i] = LowPass(xForward[i - 1], source[i].X, alpha);
+            yForward[i] = LowPass(yForward[i - 1], source[i].Y, alpha);
+            widthForward[i] = LowPass(widthForward[i - 1], source[i].Width, alpha);
+            heightForward[i] = LowPass(heightForward[i - 1], source[i].Height, alpha);
+        }
+
+        var xBackward = new double[count];
+        var yBackward = new double[count];
+        var widthBackward = new double[count];
+        var heightBackward = new double[count];
+        var last = count - 1;
+
+        xBackward[last] = xForward[last];
+        yBackward[last] = yForward[last];
+        widthBackward[last] = widthForward[last];
+        heightBackward[last] = heightForward[last];
+
+        for (var i = count - 2; i >= 0; i--)
+        {
+            var alpha = ComputeSmoothingAlpha(source[i]);
+            xBackward[i] = LowPass(xBackward[i + 1], xForward[i], alpha);
+            yBackward[i] = LowPass(yBackward[i + 1], yForward[i], alpha);
+            widthBackward[i] = LowPass(widthBackward[i + 1], widthForward[i], alpha);
+            heightBackward[i] = LowPass(heightBackward[i + 1], heightForward[i], alpha);
+        }
+
+        for (var i = 0; i < count; i++)
+        {
+            var segment = source[i];
+            var width = MakeEven(
+                (int)Math.Round(Math.Clamp(widthBackward[i], 2d, segment.FullWidth))
+            );
+            var height = MakeEven(
+                (int)Math.Round(Math.Clamp(heightBackward[i], 2d, segment.FullHeight))
+            );
+            var maxX = Math.Max(0, segment.FullWidth - width);
+            var maxY = Math.Max(0, segment.FullHeight - height);
+            var x = Math.Clamp((int)Math.Round(xBackward[i]), 0, maxX);
+            var y = Math.Clamp((int)Math.Round(yBackward[i]), 0, maxY);
+
+            yield return segment with
+            {
+                X = x,
+                Y = y,
+                Width = width,
+                Height = height,
+            };
+        }
+    }
+
     private static FilterExpressionPlan BuildFilterExpressionPlan(
         IReadOnlyList<ZoomSegment> renderSegments
     )
@@ -1233,6 +1377,91 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
             .ToList();
     }
 
+    private static double ComputeSmoothingAlpha(ZoomSegment segment)
+    {
+        var durationSeconds = Math.Max(0.001d, segment.EndSeconds - segment.StartSeconds);
+        return 1d - Math.Exp(-durationSeconds / RenderSegmentSmoothingSeconds);
+    }
+
+    private static double LowPass(double previous, double current, double alpha)
+    {
+        return previous + ((current - previous) * Math.Clamp(alpha, 0d, 1d));
+    }
+
+    private static RecordingEncoderProfile GetRecordingEncoderProfile()
+    {
+        lock (RecordingEncoderSync)
+        {
+            _recordingEncoderProfile ??= DetectRecordingEncoderProfile();
+            return _recordingEncoderProfile.Value;
+        }
+    }
+
+    private static RecordingEncoderProfile DetectRecordingEncoderProfile()
+    {
+        foreach (var candidate in RecordingEncoderCandidates)
+        {
+            if (CanUseRecordingEncoder(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return RecordingEncoderCandidates[^1];
+    }
+
+    private static bool CanUseRecordingEncoder(RecordingEncoderProfile profile)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "ffmpeg",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            startInfo.ArgumentList.Add("-hide_banner");
+            startInfo.ArgumentList.Add("-loglevel");
+            startInfo.ArgumentList.Add("error");
+            startInfo.ArgumentList.Add("-f");
+            startInfo.ArgumentList.Add("lavfi");
+            startInfo.ArgumentList.Add("-i");
+            startInfo.ArgumentList.Add("color=c=black:size=64x64:rate=30");
+            startInfo.ArgumentList.Add("-frames:v");
+            startInfo.ArgumentList.Add("4");
+            foreach (var argument in profile.Arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            startInfo.ArgumentList.Add("-f");
+            startInfo.ArgumentList.Add("null");
+            startInfo.ArgumentList.Add("-");
+
+            using var process = Process.Start(startInfo);
+            if (process is null)
+            {
+                return false;
+            }
+
+            if (!process.WaitForExit(4000))
+            {
+                process.Kill(true);
+                return false;
+            }
+
+            _ = process.StandardOutput.ReadToEnd();
+            _ = process.StandardError.ReadToEnd();
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static async Task<double?> ProbeVideoDurationSecondsAsync(
         string inputPath,
         CancellationToken cancellationToken
@@ -1345,6 +1574,54 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
         catch { }
 
         return null;
+    }
+
+    private static async Task<string?> ProbeVideoFrameRateAsync(
+        string inputPath,
+        CancellationToken cancellationToken
+    )
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "ffprobe",
+            Arguments =
+                $"-v error -select_streams v:0 -show_entries stream=avg_frame_rate,r_frame_rate -of default=noprint_wrappers=1:nokey=1 \"{inputPath}\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        try
+        {
+            using var process = Process.Start(startInfo);
+            if (process is null)
+            {
+                return null;
+            }
+
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            var stdout = await stdoutTask.ConfigureAwait(false);
+            _ = await stderrTask.ConfigureAwait(false);
+
+            if (process.ExitCode != 0)
+            {
+                return null;
+            }
+
+            var frameRates = stdout
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(static value => !string.Equals(value, "0/0", StringComparison.Ordinal))
+                .ToArray();
+
+            return frameRates.FirstOrDefault();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static IReadOnlyList<CursorEvent> MapCursorEventsToVideoSpace(
@@ -1541,91 +1818,69 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
         Func<ZoomSegment, double> valueSelector
     )
     {
-        // FIX: Reduced from 0.24s to 0.12s AND capped to half the segment duration.
-        // The old value of 0.24s was longer than most pan keyframes (5-80ms), which
-        // caused every tiny pan step to get a 240ms transition, completely destroying
-        // the filter interpolation and making zoom-in appear to take ~0.77 seconds.
-        const double maxTransitionDurationSeconds = 0.12d;
-
         if (segments.Count == 0)
         {
             return [];
         }
 
-        var valueSegments = new List<TimedValueSegment>(segments.Count * 2);
+        var valueSegments = new List<TimedValueSegment>(segments.Count);
         for (var i = 0; i < segments.Count; i++)
         {
             var segment = segments[i];
-            var startValue = valueSelector(segment);
-            var segmentAdded = false;
+            var currentValue = valueSelector(segment);
+            var previousValue = i > 0 ? valueSelector(segments[i - 1]) : currentValue;
 
-            if (i < segments.Count - 1)
-            {
-                var nextSegment = segments[i + 1];
-                if (nextSegment.StartSeconds <= segment.EndSeconds + 0.035d)
-                {
-                    var nextValue = valueSelector(nextSegment);
-                    if (!NearlyEqual(startValue, nextValue))
-                    {
-                        // FIX: Cap the transition to half the segment duration so that
-                        // short pan keyframes (e.g. 8ms) never get a transition longer
-                        // than themselves. Old code used a fixed 0.24s which was always
-                        // longer than pan segments, causing the camera to interpolate
-                        // across the wrong time range entirely.
-                        var segmentDuration = segment.EndSeconds - segment.StartSeconds;
-                        var transitionDuration = Math.Min(
-                            maxTransitionDurationSeconds,
-                            segmentDuration * 0.5d
-                        );
-
-                        var transitionStart = Math.Max(
-                            segment.StartSeconds,
-                            segment.EndSeconds - transitionDuration
-                        );
-                        if (transitionStart > segment.StartSeconds + 0.0005d)
-                        {
-                            AppendValueSegment(
-                                valueSegments,
-                                segment.StartSeconds,
-                                transitionStart,
-                                startValue,
-                                startValue
-                            );
-                        }
-
-                        // FIX: Transition ends at nextSegment.StartSeconds (straddling the
-                        // boundary) rather than segment.EndSeconds. This means the camera
-                        // starts moving before the next click lands, matching Screen Studio
-                        // behavior where the pan anticipates the next position.
-                        var transitionEnd = Math.Min(
-                            nextSegment.StartSeconds + (transitionDuration * 0.5d),
-                            nextSegment.EndSeconds
-                        );
-                        AppendValueSegment(
-                            valueSegments,
-                            transitionStart,
-                            transitionEnd,
-                            startValue,
-                            nextValue
-                        );
-                        segmentAdded = true;
-                    }
-                }
-            }
-
-            if (!segmentAdded)
+            if (i == 0)
             {
                 AppendValueSegment(
                     valueSegments,
                     segment.StartSeconds,
                     segment.EndSeconds,
-                    startValue,
-                    startValue
+                    currentValue,
+                    currentValue
+                );
+                continue;
+            }
+
+            var transitionEnd = segment.EndSeconds;
+            if (!NearlyEqual(previousValue, currentValue))
+            {
+                var transitionDurationSeconds = GetTransitionDurationSeconds(segments[i - 1], segment);
+                transitionEnd = Math.Min(
+                    segment.EndSeconds,
+                    segment.StartSeconds + transitionDurationSeconds
                 );
             }
+
+            AppendValueSegment(
+                valueSegments,
+                segment.StartSeconds,
+                transitionEnd,
+                previousValue,
+                currentValue
+            );
+
+            AppendValueSegment(
+                valueSegments,
+                transitionEnd,
+                segment.EndSeconds,
+                currentValue,
+                currentValue
+            );
         }
 
         return valueSegments;
+    }
+
+    private static double GetTransitionDurationSeconds(ZoomSegment previous, ZoomSegment current)
+    {
+        return IsPanTransition(previous, current) ? 0.09d : 0.22d;
+    }
+
+    private static bool IsPanTransition(ZoomSegment previous, ZoomSegment current)
+    {
+        return Math.Abs(previous.Width - current.Width) <= 6
+            && Math.Abs(previous.Height - current.Height) <= 6;
     }
 
     private static void AppendValueSegment(
@@ -1672,7 +1927,9 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
 
         var formattedStart = FormatFilterSeconds(startValue);
         var delta = FormatFilterSeconds(endValue - startValue);
-        return $"({formattedStart}+(({delta})*((t-{start})/max({end}-{start},0.001))))";
+        var progress = $"((t-{start})/max({end}-{start},0.001))";
+        var smoothStep = $"(({progress})*({progress})*(3-2*({progress})))";
+        return $"({formattedStart}+(({delta})*({smoothStep})))";
     }
 
     private static string FormatFilterSeconds(double value)
@@ -1940,6 +2197,22 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
 
     private void EnqueueInputEvent(PendingInputEvent pendingEvent)
     {
+        var elapsedSinceStart = pendingEvent.TimestampTicks - _startTicks;
+        if (
+            _startTicks > 0
+            && elapsedSinceStart >= 0
+            && elapsedSinceStart < RecordingStartupIgnoreTicks
+            && pendingEvent.EventType is CursorEventType.LeftDown
+                or CursorEventType.LeftUp
+                or CursorEventType.RightDown
+                or CursorEventType.RightUp
+                or CursorEventType.Scroll
+                or CursorEventType.KeyPress
+        )
+        {
+            return;
+        }
+
         System.Diagnostics.Debug.WriteLine($"[CURSOR] {pendingEvent.EventType} @ ({pendingEvent.RelativeX:F1}, {pendingEvent.RelativeY:F1})");
         _pendingInputEvents.Enqueue(pendingEvent);
     }
@@ -2226,6 +2499,8 @@ public sealed class ScreenStudioRecorderService : IScreenStudioRecorderService
         double StartValue,
         double EndValue
     );
+
+    private readonly record struct RecordingEncoderProfile(string Name, string Arguments);
 
     private readonly record struct PendingInputEvent(
         long TimestampTicks,
